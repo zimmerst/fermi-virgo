@@ -494,7 +494,7 @@ class source(object):
 
 class configuration(object):
     # done!
-    def __init__(self, xmlfile=None, cfgdefault="defaults_p7v6.xml"):#None):
+    def __init__(self, xmlfile=None, cfgdefault="fermi-virgo/base/defaults_p7v6.xml"):#None):
         self.cfgdefault = cfgdefault
         self.loghome = os.getenv("LOGDIR")
         if self.loghome is None:
