@@ -104,9 +104,9 @@ def mkdir(dir):
 
 def mkscratch():
     if os.path.exists('/scratch/'):    
-        return(mkdir('/scratch/%s/'%os.environ['USER']))
+        return(mkdir('/scratch/%s/'%os.getenv('USER',"zimmer")))
     elif os.path.exists('/tmp/'):
-        return(mkdir('/tmp/%s/'%os.environ['USER']))
+        return(mkdir('/tmp/%s/'%os.getenv("USER","zimmer")))
     else:
         raise Exception('...')
 
