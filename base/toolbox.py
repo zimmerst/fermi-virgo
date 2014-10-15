@@ -113,9 +113,9 @@ def mkscratch():
 def isBatch():
     job_id = os.getenv("LSB_JOBID","None")
     kret = False
-    if job_id != "None":
-        kret = True
+    if job_id != "None": kret = True
     print '*isBatch {}*'.format(kret)
+    stop_here()
     return kret
 
 def construction_site():
