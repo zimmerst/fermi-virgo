@@ -1,4 +1,4 @@
-from base.likelihood_class import *
+from base.likelihood import *
 import base.toolbox
 from base.xmltools import GetParameterIDForLikelihood
 import xml.dom.minidom as xdom
