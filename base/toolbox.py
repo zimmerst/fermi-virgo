@@ -112,10 +112,11 @@ def mkscratch():
 
 def isBatch():
     job_id = os.getenv("LSB_JOBID","None")
-    if job_id == "None":
-        return False
-    else:
-        return True
+    kret = False
+    if job_id != "None":
+        kret = True
+    print '*isBatch {}*'.format(kret)
+    return kret
 
 def construction_site():
     raise Exception("** Error: the feature you have requested is not there (yet) **");
