@@ -562,7 +562,7 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
     out['STOOLS']="ST-%s"%os.getenv("INST_DIR").split("/")[-1]
     out["llh0"]=roi.fitNull()                                               
     print '*INFO* done with likelihood at %s'%str(time.ctime())
-    sleeptime = random.randrange(0,200)
+    sleeptime = 15
     print '*INFO* sleeping for %is to avoid stressing disk'%int(sleeptime)
     time.sleep(sleeptime)    
     f = open(configuration.resultsfile,'rb')
