@@ -21,7 +21,7 @@ import pyfits, yaml
 import xml.parsers.expat
 import xml.dom.minidom as xdom
 import StringIO
-import gc, traceback, glob, time, random, shutil
+import os,gc, traceback, glob, time, random, shutil
 import pickle
 # numpy
 import numpy as np
