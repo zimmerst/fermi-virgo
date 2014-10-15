@@ -802,7 +802,9 @@ class configuration(object):
 
     def getTempDir(self):
         base = "/tmp"
-        if toolbox.isBatch:
+        BATCH = toolbox.isBatch
+        print "*** INFO *** BATCH {}".format(BATCH)
+        if BATCH:
             base = "/scratch"
         job_id = str(np.random.randint(1,999999999))
         usr = os.getenv("USER","zimmer")
