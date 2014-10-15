@@ -98,11 +98,20 @@ def make_envfile(ffile):
     os.chmod(ffile,0755)
     print '*INFO* wrote env file %s'%ffile
 
+def mkdir(dir):
+    if not os.path.exists(dir):  os.makedirs(dir)
+    return dir
+
+def mkscratch():
+    if os.path.exists('/scratch/'):    
+        return(mkdir('/scratch/%s/'%os.environ['USER']))
+    elif os.path.exists('/tmp/'):
+        return(mkdir('/tmp/%s/'%os.environ['USER']))
+    else:
+        raise Exception('...')
+
 def isBatch():
-    kret = False
-    job_id = os.getenv("LSB_JOBID",None)
-    if job_id and str(job_id)!='None' : kret = True
-    return kret
+    return mkscratch()
 
 def construction_site():
     raise Exception("** Error: the feature you have requested is not there (yet) **");
