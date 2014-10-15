@@ -2,7 +2,29 @@
 import os
 import xml.dom.minidom
 import StringIO
+
 # string operations
+def elm2dict(xelm,callable=str):
+    return {callable(key):callable(xelm.attributes[key].value) for key in xelm.attributes.keys()}
+
+def unmarshalGtlikeXml(xmlfile):
+    xe = xml.dom.minidom.parse(xmlfile)
+    sources = xe.getElementsByTagName("source")
+    d = {}
+    for source in sources:
+        srcDict = elm2dict(source)
+        spectrum = source.getElementsByTagName("spectrum")[0]
+        spatialM = source.getElementsByTagName("spatialModel")[0]
+        srcDict["spectrum"]=elm2dict(spectrum)
+        srcDict["spatialModel"]=elm2dict(spatialM)
+        srcDict["spectrum"]["parameters"]=[elm2dict(par) for par in spectrum.getElementsByTagName("parameter")]
+        srcDict["spatialModel"]["parameters"]=[elm2dict(par) for par in spatialM.getElementsByTagName("parameter")]
+        d[srcDict["name"]]=srcDict
+    return d
+
+def marshalGtlikeXMl(d):
+    # todo!
+    pass
 
 # pretty much obsolete
 class pickle_dict(object):

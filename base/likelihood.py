@@ -803,7 +803,6 @@ class configuration(object):
     def getTempDir(self):
         base = "/tmp"
         BATCH = toolbox.isBatch()
-        print "*** INFO *** BATCH {}".format(BATCH)
         if BATCH:
             base = "/scratch"
         job_id = str(np.random.randint(1,999999999))
@@ -1268,6 +1267,9 @@ else:
             self.isnull = False
             self.__dict__.update(kwargs)
 
+        
+
+
         def getListOfTargets(self,suppressZero=False):
             """
             the list of targets in the whole sample; targets are defined in the ROI (objects in ROI xml)
@@ -1340,6 +1342,12 @@ else:
             LLH.restore()
             return source.TSvalue
 
+        def exportFitResultToDict(self):
+            gtlikeXml = NamedTemporaryFile(prefix=os.getenv("TEMPDIR") + "/").name
+            self.likelihood_fcn.writeXml(gtlikeXml)
+            d = xmltools.unmarshalGtlikeXml(gtlikeXml)
+            os.remove(gtlikeXml) # cleaning up
+            return d
 
         def export_TSvalue(self):
             # now this is a new interesting feature: we write one continuous xml file with all sources that we
