@@ -804,7 +804,7 @@ class configuration(object):
         base = "/tmp"
         if toolbox.isBatch:
             base = "/scratch"
-        job_id = np.random.randint(1,999999999)
+        job_id = str(np.random.randint(1,999999999))
         usr = os.getenv("USER","zimmer")
         o = os.path.join(base,usr,job_id)
         print '*INFO* using temp path: %s'%o
