@@ -435,7 +435,9 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     out['FinalState']=finalstate
     out['ROI']=roi.name
     out['STOOLS']="ST-%s"%os.getenv("INST_DIR").split("/")[-1]
+    
     out["llh0"],out["xmlNull"]=roi.fitNull(export_fit=True) # now returns a tuple!
+    
     out["xmlNull"]=roi.exportFitResultToDict()
     print '*INFO* done with likelihood at %s'%str(time.ctime())
     sleeptime = 15

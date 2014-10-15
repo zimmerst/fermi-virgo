@@ -1420,6 +1420,24 @@ else:
                         self.list_of_sources.append(thesource)
                         self.sourceNames.append(thesource.name)
 
+        def fitNull(self,export_fit=False):
+            oldModel = self.modelxml
+            print '*** DOING NULLFIT ***'
+            self.make_nullfit()
+            self._prepare()
+            self.configuration.nullhypothesis = "True"
+            self.fit(None)
+            LLHNull = self.likelihood_fcn()
+            _dict = self.exportFitResultToDict()
+            # got back to best fit setup
+            os.remove(self.modelxml)
+            self.modelxml = oldModel
+            self._prepare()
+            self.configuration.nullhypothesis = "False"
+            if export_fit:
+                return (LLHNull,_dict)
+            else:
+                return LLHNull,None
 
         def fit(self, mysource):
             print('*INFO* now entering FIT ')
