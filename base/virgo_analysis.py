@@ -672,7 +672,7 @@ def likelihood(roi,mass_points,dry=True,ignore_batch=False,final_states=None,j=1
             cmds = []
             for m in masses:
                 if IC: chunk = pack(roi,roi.configuration,minos_id)
-                cmd = 'python base/virgo_analysis.py "runLikelihood" %s %1.8f %1.8e'%(chunk,m,j)
+                cmd = 'python fermi-virgo/base/virgo_analysis.py "runLikelihood" %s %1.8f %1.8e'%(chunk,m,j)
                 if IC:                   cmd+=" --IC" # activate IC
                 if scan:                 cmd+=" --scan"
                 if not scan_min is None: cmd+=" --scan_min=%1.4e"%float(scan_min)
@@ -695,7 +695,7 @@ def likelihood(roi,mass_points,dry=True,ignore_batch=False,final_states=None,j=1
         del d_pick
         chunk = pack(roi,roi.configuration,minos_id)
         print '*INFO* packing chunk %s'%chunk
-        cmd = 'python base/virgo_analysis.py "runLikelihoodCR" %s %1.8f %1.8e'%(chunk,100.,j)
+        cmd = 'python fermi-virgo/base/virgo_analysis.py "runLikelihoodCR" %s %1.8f %1.8e'%(chunk,100.,j)
         if scan:                 cmd+=" --scan"
         if not scan_min is None: cmd+=" --scan_min=%1.4e"%float(scan_min)
         if not scan_max is None: cmd+=" --scan_max=%1.4e"%float(scan_max)
