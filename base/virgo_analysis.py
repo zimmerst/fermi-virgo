@@ -9,30 +9,27 @@ import copy, sys, os, pickle, time, yaml
 import lsf
 
 def effectiveJ(mass,finalState="ee"):
-    ratio_ee = {80.0: 6870.8334694828354, 100.0: 7857.3235653271013, 5.0: 1.0, 1000.0: 8796.6830234728004, 300.0: 9536.9635653948353, 10.0: 1.0, 12.0: 1.0001583731779042, 500.0: 9358.6246594617005, 15.0: 1.1489987912435411, 2000.0: 8120.2511392272336, 200.0: 9372.6704750819463, 50.0: 3922.6097800051202, 20.0: 24.791874384337806, 40.0: 2344.9138681816676, 25.0: 229.70062960201443, 30.0: 751.01037167073275}
-    ratio_mu = {80.0: 2061.1646238830808, 100.0: 3075.946719746662, 5.0: 1.0, 1000.0: 10655.988532241725, 300.0: 8209.7408534267888, 10.0: 1.0, 12.0: 1.0, 500.0: 9672.8832784911829, 15.0: 1.000999814296067, 2000.0: 10768.481332069472, 200.0: 6502.5240241749752, 50.0: 551.14539383992917, 20.0: 1.3422163985180275, 40.0: 209.95731162025731, 25.0: 6.9740449704918319, 30.0: 33.672956505908054}
+    ratio_ee = {80.0: 6870.8334694828354, 100.0: 7857.3235653271013, 5.0: 1.0, 1000.0: 8796.6830234728004, 
+                300.0: 9536.9635653948353, 10.0: 1.0, 12.0: 1.0001583731779042, 500.0: 9358.6246594617005, 
+                15.0: 1.1489987912435411, 2000.0: 8120.2511392272336, 200.0: 9372.6704750819463, 
+                50.0: 3922.6097800051202, 20.0: 24.791874384337806, 40.0: 2344.9138681816676, 
+                25.0: 229.70062960201443, 30.0: 751.01037167073275}
+    ratio_mu = {80.0: 2061.1646238830808, 100.0: 3075.946719746662, 5.0: 1.0, 1000.0: 10655.988532241725, 
+                300.0: 8209.7408534267888, 10.0: 1.0, 12.0: 1.0, 500.0: 9672.8832784911829, 
+                15.0: 1.000999814296067, 2000.0: 10768.481332069472, 200.0: 6502.5240241749752, 
+                50.0: 551.14539383992917, 20.0: 1.3422163985180275, 40.0: 209.95731162025731, 
+                25.0: 6.9740449704918319, 30.0: 33.672956505908054}
     return 1
-    # if finalState == "ee":
-    #     if mass in ratio_ee:
-    #         return ratio_ee[mass]
-    #     else: 
-    #         raise Exception("mass not found")
-    # elif finalState == "mumu":
-    #     if mass in ratio_mu:
-    #         return ratio_mu[mass]
-    #     else: 
-    #         raise Exception("mass not found")
-    # else:
-    #     raise Exception("final state not upported")
 
-#eeIC = {20:'ee_IC_mx20GeV.dat',15:'ee_IC_mx15GeV.dat',25:'ee_IC_mx25GeV.dat',300:'ee_IC_mx300GeV.dat',500:'ee_IC_mx500GeV.dat',100:'ee_IC_mx100GeV.dat',5:'ee_IC_mx5GeV.dat',50:'ee_IC_mx50GeV.dat',12:'ee_IC_mx12GeV.dat',80:'ee_IC_mx80GeV.dat',10:'ee_IC_mx10GeV.dat',2000:'ee_IC_mx2000GeV.dat',200:'ee_IC_mx200GeV.dat',1000:'ee_IC_mx1000GeV.dat',40:'ee_IC_mx40GeV.dat',30:'ee_IC_mx30GeV.dat'}
+eeIC = {20:'ee_IC_mx20GeV.dat',15:'ee_IC_mx15GeV.dat',25:'ee_IC_mx25GeV.dat',300:'ee_IC_mx300GeV.dat',
+        500:'ee_IC_mx500GeV.dat',100:'ee_IC_mx100GeV.dat',5:'ee_IC_mx5GeV.dat',50:'ee_IC_mx50GeV.dat',
+        12:'ee_IC_mx12GeV.dat',80:'ee_IC_mx80GeV.dat',10:'ee_IC_mx10GeV.dat',2000:'ee_IC_mx2000GeV.dat',
+        200:'ee_IC_mx200GeV.dat',1000:'ee_IC_mx1000GeV.dat',40:'ee_IC_mx40GeV.dat',30:'ee_IC_mx30GeV.dat'}
 
-eeIC = {20:'ee_IC_mx20GeV.dat',15:'ee_IC_mx15GeV.dat',25:'ee_IC_mx25GeV.dat',300:'ee_IC_mx300GeV.dat',500:'ee_IC_mx500GeV.dat',100:'ee_IC_mx100GeV.dat',5:'ee_IC_mx5GeV.dat',50:'ee_IC_mx50GeV.dat',12:'ee_IC_mx12GeV.dat',80:'ee_IC_mx80GeV.dat',10:'ee_IC_mx10GeV.dat',2000:'ee_IC_mx2000GeV.dat',200:'ee_IC_mx200GeV.dat',1000:'ee_IC_mx1000GeV.dat',40:'ee_IC_mx40GeV.dat',30:'ee_IC_mx30GeV.dat'}
-
-#mumuIC = {100.0: 'mumu_00.dat',  125.892541: 'mumu_01.dat', 158.489319: 'mumu_02.dat', 199.526231: 'mumu_03.dat', 251.188643: 'mumu_04.dat', 316.227766: 'mumu_05.dat', 398.107171: 'mumu_06.dat', 501.187234: 'mumu_07.dat', 630.957344: 'mumu_08.dat', 794.328235: 'mumu_09.dat', 1000.0: 'mumu_10.dat', 1258.92541: 'mumu_11.dat', 1584.89319: 'mumu_12.dat', 1995.26231: 'mumu_13.dat', 2511.88643: 'mumu_14.dat', 3162.27766: 'mumu_15.dat', 3981.07171: 'mumu_16.dat', 5011.87234: 'mumu_17.dat', 6309.57344: 'mumu_18.dat', 7943.28235: 'mumu_19.dat'}
-
-mumuIC = {20:'mumu_IC_mx20GeV.dat',15:'mumu_IC_mx15GeV.dat',25:'mumu_IC_mx25GeV.dat',300:'mumu_IC_mx300GeV.dat',500:'mumu_IC_mx500GeV.dat',100:'mumu_IC_mx100GeV.dat',5:'mumu_IC_mx5GeV.dat',50:'mumu_IC_mx50GeV.dat',12:'mumu_IC_mx12GeV.dat',80:'mumu_IC_mx80GeV.dat',10:'mumu_IC_mx10GeV.dat',2000:'mumu_IC_mx2000GeV.dat',200:'mumu_IC_mx200GeV.dat',1000:'mumu_IC_mx1000GeV.dat',40:'mumu_IC_mx40GeV.dat',30:'mumu_IC_mx30GeV.dat'}
-
+mumuIC = {20:'mumu_IC_mx20GeV.dat',15:'mumu_IC_mx15GeV.dat',25:'mumu_IC_mx25GeV.dat',300:'mumu_IC_mx300GeV.dat',
+          500:'mumu_IC_mx500GeV.dat',100:'mumu_IC_mx100GeV.dat',5:'mumu_IC_mx5GeV.dat',50:'mumu_IC_mx50GeV.dat',
+          12:'mumu_IC_mx12GeV.dat',80:'mumu_IC_mx80GeV.dat',10:'mumu_IC_mx10GeV.dat',2000:'mumu_IC_mx2000GeV.dat',
+          200:'mumu_IC_mx200GeV.dat',1000:'mumu_IC_mx1000GeV.dat',40:'mumu_IC_mx40GeV.dat',30:'mumu_IC_mx30GeV.dat'}
 
 channel_mapping = {
     1  :  ["e+e-","ee"]                  ,
@@ -286,7 +283,8 @@ def prepareIC(roi,j,mass,final_state,tmpdir,specDir):
     print '*INF* wrote temporary xml with IC: %s'%ofile
     return ofile
 
-def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,scan=False,scan_min=0,scan_max=None,scan_npts=20,IC=True,force_srcmap = True,std_diffuse=True,yamlfile=None):
+def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,scan=False,scan_min=0,
+                       scan_max=None,scan_npts=20,force_srcmap = True,std_diffuse=True,yamlfile=None,IC=True):
     if roi.__dict__.has_key("egal"):
         os.environ["EGAL"]=roi.egal
     if roi.__dict__.has_key("gal"):
@@ -301,11 +299,10 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     if os.getenv("LSB_JOBID") is None:
         tmpdir = tmpdir.replace("scratch","tmp") # running locally
     if finalstate in ['ee','mumu']:
-        if IC:
-          #specDir = os.path.join(os.getenv("PWD"),"spectra")
-          specDir = os.path.join(os.getenv("PWD"),"spectra_v2")
-          roi.modelxml = prepareIC(roi,j,mass_point,finalstate,tmpdir,specDir)
-          par = "ScaleFactor"
+        # switch on demand to IC!
+        specDir = os.path.join(os.getenv("PWD"),"spectra_v2")
+        roi.modelxml = prepareIC(roi,j,mass_point,finalstate,tmpdir,specDir)
+        par = "ScaleFactor"
     # enforce recreation of gtsrcmaps    
     if force_srcmap:
         tmpName = os.path.basename(roi.modelxml).replace(".xml",".fits")
@@ -325,7 +322,7 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     Id = roi.likelihood_fcn.par_index(src.name,par)
     roi.likelihood_fcn[Id].parameter.setBounds(0,1e12)
     roi.likelihood_fcn[Id].parameter.setScale(1e-26)
-    if IC:
+    if finalstate in ['ee','mumu']:
         # just set the norm!
         Id = roi.likelihood_fcn.par_index(src.name,"Normalization")
         jnorm = norm(mass_point,j)
@@ -372,16 +369,6 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
         minos = False # disable minos!
         print '*INFO* requested SCAN of LLH rather than MINOS, skip MINOS'
     if minos:
-        #         #minos_id = 23 # bloody hack...
-        #         minos_id = roi.minos_id# 19 # bloody hack...
-        # #GetParameterIDForLikelihood(roi.modelxml,src.name)
-        #         try:
-        #             minNeg,minPos = roi.minuit_object.Minos(minos_id,cl)
-        #         except RuntimeError:
-        #             print '*ERROR* could not determine MINOS, but we bravely carry on!'
-        #minos_id = 23 # bloody hack...
-        # a new trick!
-        #else:
         minos_id = None
         freePars = {i:p.getName() for i,p in enumerate(roi.likelihood_fcn.params()) if p.isFree()}
         for i,p in enumerate(sorted(freePars)):
@@ -409,9 +396,7 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
         llh_scan = roi.likelihood_fcn.scan(src.name,par, xmin=sc_min, xmax=sc_max, npts=scan_npts,tol=1e-10, optimizer=configuration.optimizer, optObject=roi.minuit_object)
 
     # last not least, need store stuff
-    #roi.print_summary(src)
-    # for now, store dict...
-    out = {}
+   out = {}
     out["fitResultXml"]=roi.exportFitResultToDict() # store stuff as dict instead of xml!
     out['mass']=mass_point
     Id = roi.likelihood_fcn.par_index(src.name,par)
@@ -424,7 +409,7 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
         out['sigmav'].update({'pos':minPos,'neg':minNeg})
     if scan:
         out['sigmav'].update({'scan':llh_scan})
-    print '****** DEBUG *****: std_diffuse = %s'%str(std_diffuse)
+    print '*** done with fitting, storing results ***'
     if std_diffuse:
         Id = roi.likelihood_fcn.par_index("GAL","Prefactor")
         out['GAL']={'Prefactor':roi.likelihood_fcn[Id].parameter.getValue()*roi.likelihood_fcn[Id].parameter.getScale(),
@@ -740,7 +725,7 @@ if __name__ == "__main__":
             make_srcmap = False
             if opts.ic:
                 make_srcmap = True
-            process_likelihood(ROI,configuration,float(args[3]),j=float(args[4]),scan=opts.scan,scan_min=opts.scan_min,scan_max=opts.scan_max,scan_npts=opts.scan_npts,IC=opts.ic,force_srcmap=make_srcmap,std_diffuse=opts.diffuse,yamlfile=opts.yaml_out)
+            process_likelihood(ROI,configuration,float(args[3]),j=float(args[4]),scan=opts.scan,scan_min=opts.scan_min,scan_max=opts.scan_max,scan_npts=opts.scan_npts,force_srcmap=make_srcmap,std_diffuse=opts.diffuse,yamlfile=opts.yaml_out)
             print '*INFO* done with running, attempting to remove chunk %s'%chunk
             configuration.removeTempDir() # remove the temp dir!
             os.remove(chunk)
