@@ -396,7 +396,7 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
         llh_scan = roi.likelihood_fcn.scan(src.name,par, xmin=sc_min, xmax=sc_max, npts=scan_npts,tol=1e-10, optimizer=configuration.optimizer, optObject=roi.minuit_object)
 
     # last not least, need store stuff
-   out = {}
+    out = {}
     out["fitResultXml"]=roi.exportFitResultToDict() # store stuff as dict instead of xml!
     out['mass']=mass_point
     Id = roi.likelihood_fcn.par_index(src.name,par)
