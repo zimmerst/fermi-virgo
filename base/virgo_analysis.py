@@ -1,6 +1,6 @@
-from likelihood_class import *
-import toolbox
-from xmltools import GetParameterIDForLikelihood
+from base.likelihood_class import *
+import base.toolbox
+from base.xmltools import GetParameterIDForLikelihood
 import xml.dom.minidom as xdom
 from tempfile import NamedTemporaryFile
 from skymaps import SkyDir
