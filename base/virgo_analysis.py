@@ -409,8 +409,10 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
         out['sigmav'].update({'pos':minPos,'neg':minNeg})
     if scan:
         out['sigmav'].update({'scan':llh_scan})
-    print '*** done with fitting, storing results ***'
+    print '*** done with fitting, calculating TS for diffuse sources ***'
+
     if std_diffuse:
+        # calculate TS values for diffuse components
         Id = roi.likelihood_fcn.par_index("GAL","Prefactor")
         out['GAL']={'Prefactor':roi.likelihood_fcn[Id].parameter.getValue()*roi.likelihood_fcn[Id].parameter.getScale(),
                     'Ts':roi.likelihood_fcn.Ts("GAL",reoptimize=True),
@@ -423,7 +425,9 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
                 'Ts':roi.likelihood_fcn.Ts("EGAL",reoptimize=True),
                 'Npred':roi.likelihood_fcn.logLike.NpredValue("EGAL")}
     out['CL']=cl
+    print '*** calculating current val of LLH ***'
     out['llh']=roi.likelihood_fcn()
+    print '*** done with fits, storing results ***'
     if not llh_scan is None:
         #if len(llh_scan)==2:
         #    llh_scan[1]*=out['llh']
@@ -434,8 +438,9 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     out["llh0"],out["xmlNull"]=roi.fitNull(export_fit=True) # now returns a tuple!
     out["xmlNull"]=roi.exportFitResultToDict()
     print '*INFO* done with likelihood at %s'%str(time.ctime())
-    print '*INFO* sleeping for some random time between 0 and 100s to avoid stressing disk'
-    time.sleep(random.randrange(0,100))
+    sleeptime = 15
+    print '*INFO* sleeping for %i secs to avoid stressing disk'%sleeptime
+    time.sleep(sleeptime)
     f = open(configuration.resultsfile,'rb')
     dumpstring = f.read()
     d = pickle.loads(dumpstring)
