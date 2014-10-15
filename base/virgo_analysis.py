@@ -570,7 +570,6 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
     d = pickle.loads(dumpstring)
     d.update({"CR":out}) # update old dict
     # could also try to write yaml
-    sleeptime = random.randrange(0,200)
     print '*INFO* sleeping for %is to avoid stressing disk'%int(sleeptime)
     time.sleep(sleeptime)    
     if yamlfile is None:
