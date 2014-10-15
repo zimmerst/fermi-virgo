@@ -409,20 +409,20 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
         out['sigmav'].update({'pos':minPos,'neg':minNeg})
     if scan:
         out['sigmav'].update({'scan':llh_scan})
-    print '*** done with fitting, calculating TS for diffuse sources ***'
+    print '*** done with fitting, calculating Npred for diffuse sources ***'
 
     if std_diffuse:
         # calculate TS values for diffuse components
         Id = roi.likelihood_fcn.par_index("GAL","Prefactor")
         out['GAL']={'Prefactor':roi.likelihood_fcn[Id].parameter.getValue()*roi.likelihood_fcn[Id].parameter.getScale(),
-                    'Ts':roi.likelihood_fcn.Ts("GAL",reoptimize=True),
+                    #'Ts':roi.likelihood_fcn.Ts("GAL",reoptimize=True),
                     'Npred':roi.likelihood_fcn.logLike.NpredValue("GAL")}
         Id = roi.likelihood_fcn.par_index("GAL","Index")
         out['GAL']["Index"]=roi.likelihood_fcn[Id].parameter.getValue()*roi.likelihood_fcn[Id].parameter.getScale()
     
     Id = roi.likelihood_fcn.par_index("EGAL","Normalization")
     out['EGAL']={'Normalization':roi.likelihood_fcn[Id].parameter.getValue()*roi.likelihood_fcn[Id].parameter.getScale(),
-                'Ts':roi.likelihood_fcn.Ts("EGAL",reoptimize=True),
+                #'Ts':roi.likelihood_fcn.Ts("EGAL",reoptimize=True),
                 'Npred':roi.likelihood_fcn.logLike.NpredValue("EGAL")}
     out['CL']=cl
     print '*** calculating current val of LLH ***'
