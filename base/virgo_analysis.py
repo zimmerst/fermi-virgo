@@ -228,7 +228,7 @@ def make_prepare(roi,create_virgo=True,dry=True,template_dict=None):
         f.write(x.toxml())
         f.close()
     cmd = run_prepare(roi)
-    cmds = "from toolbox import *\nimport os,sys\nsetPF()\nprint \"GAL:\",os.getenv('GAL'), \"EGAL:\",os.getenv('EGAL') \nprint '**** DEBUG XML *****'"
+    cmds = "from base.toolbox import *\nimport os,sys\nsetPF()\nprint \"GAL:\",os.getenv('GAL'), \"EGAL:\",os.getenv('EGAL') \nprint '**** DEBUG XML *****'"
     cmds += "\nos.system('cat %s')\nprint '****** running gtsrcmaps ******'\nos.system('%s')\ncleanPF()"%(roi.modelxml,cmd)
     cmd_file = NamedTemporaryFile(prefix=os.getenv("MYTMPDIR")+"/").name
     f = open(cmd_file,"w")
@@ -672,7 +672,7 @@ def likelihood(roi,mass_points,dry=True,ignore_batch=False,final_states=None,j=1
             cmds = []
             for m in masses:
                 if IC: chunk = pack(roi,roi.configuration,minos_id)
-                cmd = 'python virgo_analysis.py "runLikelihood" %s %1.8f %1.8e'%(chunk,m,j)
+                cmd = 'python base/virgo_analysis.py "runLikelihood" %s %1.8f %1.8e'%(chunk,m,j)
                 if IC:                   cmd+=" --IC" # activate IC
                 if scan:                 cmd+=" --scan"
                 if not scan_min is None: cmd+=" --scan_min=%1.4e"%float(scan_min)
@@ -695,7 +695,7 @@ def likelihood(roi,mass_points,dry=True,ignore_batch=False,final_states=None,j=1
         del d_pick
         chunk = pack(roi,roi.configuration,minos_id)
         print '*INFO* packing chunk %s'%chunk
-        cmd = 'python virgo_analysis.py "runLikelihoodCR" %s %1.8f %1.8e'%(chunk,100.,j)
+        cmd = 'python base/virgo_analysis.py "runLikelihoodCR" %s %1.8f %1.8e'%(chunk,100.,j)
         if scan:                 cmd+=" --scan"
         if not scan_min is None: cmd+=" --scan_min=%1.4e"%float(scan_min)
         if not scan_max is None: cmd+=" --scan_max=%1.4e"%float(scan_max)
