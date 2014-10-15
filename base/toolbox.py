@@ -115,7 +115,6 @@ def isBatch():
     kret = False
     if job_id != "None": kret = True
     print '*isBatch {}*'.format(kret)
-    stop_here()
     return kret
 
 def construction_site():
