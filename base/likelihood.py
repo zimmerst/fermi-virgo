@@ -802,7 +802,7 @@ class configuration(object):
 
     def getTempDir(self):
         base = "/tmp"
-        BATCH = toolbox.isBatch
+        BATCH = toolbox.isBatch()
         print "*** INFO *** BATCH {}".format(BATCH)
         if BATCH:
             base = "/scratch"
