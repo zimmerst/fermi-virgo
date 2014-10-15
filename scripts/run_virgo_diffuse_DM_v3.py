@@ -1,8 +1,9 @@
-import virgo_analysis as VA
+import base.virgo_analysis as VA
 import sys, os, time
 from tempfile import NamedTemporaryFile
-from xmltools import expandEnvVarsInXml
-from common import *
+from base.xmltools import expandEnvVarsInXml
+from base.common import *
+
   
 from optparse import OptionParser
 usage = "Usage: %prog  [options] input"
