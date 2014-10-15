@@ -1,0 +1,80 @@
+<?xml version="1.0" ?><parameter_list title="jobTitle">
+  <jobOptions>
+    <parameter name="HOME" value="/afs/slac/g/glast/users/zimmer/FermiData/Clusters" xcomment="here all data is stored"/>
+    <parameter name="chatter" value="2" xcomment=" 0: ERROR, 1: WARNING, &gt;1 crying wolf"/>
+    <parameter name="Debug" value="False" xcomment="if set to true, everything is run in debug mode, i.e. no processing is done"/>
+    <parameter name="AnalysisMode" value="binned" xcomment="default binned, other modes supported only_xml and partially unbinned"/>
+    <parameter name="Simulation" value="True" xcomment="set to true for simulation"/>
+    <parameter name="FixDiffuse" value="False" xcomment="set to true for simulation"/>
+    <parameter name="email" value="zimmer@slac.stanford.edu" xcomment="results file will be sent via email, if unwanted, comment line"/>
+    <parameter name="prep_tools" value="gtselect,gtbin_cmap,gtbin_ccube,gtexpcube2,modify_diffuse_xml,gtsrcmaps" xcomment="none"/>
+  	<parameter name="event_class" value="clean" xcomment="none"/>
+  </jobOptions>
+  <DataSet>
+    <parameter name="Seedfile" value="None" xcomment="if we have multiple sources in ROI, use seedfile rather than template"/>
+    <parameter name="cdate" value="None" xcomment="time string, kept for compatibility reasons"/>
+    <parameter name="IRF" value="P7SOURCE_V6" xcomment="IRF to use"/>
+    <!-- for filter string: use &amp; for & and &lt; for < -->
+    <parameter name="FilterString" value="ABS(ROCK_ANGLE)&lt;52" xcomment="filter to use in gtmktime"/>
+    <parameter name="TStart" value="239557414" xcomment="start of data taking in seconds"/>
+    <parameter name="TStop" value="365787814" xcomment="end point of observation"/>
+    <parameter name="EMin" value="1e2" xcomment="Minimum photon energy for statistics"/>
+    <parameter name="EMax" value="4.5e5" xcomment="1e5,Maximum photon energy for statistics"/>
+    <parameter name="nEBin" value="25" xcomment="number of energy bins"/>
+    <parameter name="zmax" value="100" xcomment="zenith angle cut"/>
+    <parameter name="dcostheta" value="0.025" xcomment="input for qltcube"/>
+    <parameter name="binsize" value="1" xcomment="input for qltcube"/>
+    <!-- obs: *IF* we use 10 degree radius, box should be at least sqrt(200)/2~14.14 deg -->
+    <!-- obs: for 40 deg -> 56.6 deg size / 0.1 -> 566 bins in each direction -->
+    <parameter name="nxpix" value="142" xcomment="xbins for gtbin"/> 
+    <parameter name="nypix" value="142" xcomment="ybins for gtbin"/>
+    <parameter name="binsz" value="0.1" xcomment="spread in binning"/>
+  </DataSet>
+  <XMLModel>
+    <parameter name="isotropic" value="EGAL" xcomment="the name of the extragal bkg"/>
+    <parameter name="galactic" value="GAL" xcomment="name of the diffuse bkg"/>
+    <parameter name="FinalState" value="bbbar" xcomment="bbbar final state / standard"/>
+    <parameter name="create_xml" value="False" xcomment="set to false to ignore XML generation"/>    
+    <parameter name="template" value="test.xml" xcomment="the template for all xmls to create"/>
+    <parameter name="exception_xml" value="" xcomment="if you want to override certain sources, place them in a proper xml and give its content here"/>
+    <parameter name="newCatalogSorter" value="True" xcomment="if False, use the old catalogSorter3.py, otherwise new one"/>
+    <parameter name="source_suffix" value="_dm" xcomment="suffix for source name"/>
+    <parameter name="constrained_parameter" value="sigmav" xcomment="the name of the parameter to constrain in likelihood"/>
+    <parameter name="catalog" value="3FGL" xcomment="version of the catalog"/>
+    <parameter name="pointsource_xml" value="/afs/slac/g/glast/users/zimmer/FermiData/Catalogs/3FGL/merged_2fgl_3fgl.xml" xcomment="the location of the point source xml"/>
+    <parameter name="ROI" value="10" xcomment="ROI size in case of non adaptive choice"/>
+    <parameter name="InclusionRadius" value="15" xcomment="radius of sources we want to include in model xml"/>
+    <parameter name="PSFFix" value="False" xcomment="per default this is False, if set to True, all point sources are set to fixed values"/>
+    <parameter name="PSFRadius" value="5." xcomment="Radius in which sources should have free normalization"/>
+  </XMLModel>
+  <IndividualLikelihood>
+    <parameter name="calculateSourceTs" value="False" xcomment="if set to False, gtlike xml file will NOT contain individual TS values"/>
+    <parameter name="Ind_DoFit" value="True" xcomment="if False, whole section is skipped"/>
+    <parameter name="Ind_DoMINOS" value="True" xcomment="set to False if you want to skip MINOS calculations"/>
+    <parameter name="nullhypothesis" value="False" xcomment="must be set if requested"/>
+    <parameter name="Ind_DoTS" value="True" xcomment="set to False if you want to skip TS calculation"/>
+    <parameter name="scan_likelihood" value="False" xcomment="if set to false, no scan is performed, else all Likelihoods and combined are stored"/>
+    <parameter name="newLikelihood" value="True" xcomment="if set to False use old likelihood implementation"/>
+    <parameter name="optimizer" value="Minuit" xcomment="standard value, if changed may make problems"/>
+    <parameter name="CL" value="2.71" xcomment="confidence interval"/>
+    <parameter name="SaveXML" value="True" xcomment="if you set to False, no xml file is written based on the fit values"/>
+    <parameter name="Plot" value="True" xcomment="if False, plots are ignored"/>
+    <parameter name="CalculateFlux" value="True" xcomment="if True, need to supply flux file and some other specifics / flagged for removal"/>
+  </IndividualLikelihood>
+  <Composite2>
+    <parameter name="C2_DoFit" value="True" xcomment="if False, section is ignored"/>
+    <parameter name="C2_DoMINOS" value="True" xcomment="if False, no limits are calculated"/>
+    <parameter name="C2_TieParameter" value="True" xcomment="default True, tie DM/CR parameters"/>
+    <parameter name="C2_TieGal" value="False" xcomment="default False"/>
+    <parameter name="C2_TieEgal" value="False" xcomment="default False"/>
+    <parameter name="WriteROOTFile" value="True" xcomment="if set to False only textfile is created, flagged for removal"/>
+  </Composite2>
+  <PostProcessing>
+    <parameter name="MakeMaps" value="True" xcomment="default true, otherwise no maps are generated"/>
+    <parameter name="MakeCMaps" value="True" xcomment="ignore count maps if set to false, but then sigma is omitted too"/>
+    <parameter name="MakeResMap" value="True" xcomment="ignores to create sigma maps if set to false"/>
+    <parameter name="SaveAllSteps" value="True" xcomment="if set to False, only final files are written *obsolete*?"/>
+  </PostProcessing>
+<override>
+<override_parameter name="whitness" value="/u/gl/zimmer/projects/Cluster/prod/CompLike2/whitness.log"/></override>
+</parameter_list>
