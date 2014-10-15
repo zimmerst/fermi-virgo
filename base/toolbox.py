@@ -99,9 +99,10 @@ def make_envfile(ffile):
     print '*INFO* wrote env file %s'%ffile
 
 def isBatch():
+    kret = False
     job_id = os.getenv("LSB_JOBID",None)
-    if job_id: return True
-    else: return False
+    if job_id and str(job_id)!='None' : kret = True
+    return kret
 
 def construction_site():
     raise Exception("** Error: the feature you have requested is not there (yet) **");
