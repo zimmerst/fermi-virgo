@@ -303,6 +303,7 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
         specDir = os.path.join(os.getenv("PWD"),"spectra_v2")
         roi.modelxml = prepareIC(roi,j,mass_point,finalstate,tmpdir,specDir)
         par = "ScaleFactor"
+        run_prepare(roi,dry=False) # force re-running gtsrcmaps # MUST re-run w/ IC!
     # enforce recreation of gtsrcmaps    
     if force_srcmap:
         tmpName = os.path.basename(roi.modelxml).replace(".xml",".fits")
