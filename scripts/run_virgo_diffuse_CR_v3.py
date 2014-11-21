@@ -32,6 +32,8 @@ parser.add_option("--queue",dest='queue', type='str', default = "bullet-xxl",
                  help = "LSF queue")
 parser.add_option("--ignore-logs",dest='ignore_logs', action='store_true', default = False,
                  help = "use this to not change log-dir content (expert option)")
+parser.add_option("--model",dest="model",default=None,help="instead of running zillion models, choose which one to pick, std is Std_Gal_diffuse")
+
 (opts, args) = parser.parse_args()
 
 step = sys.argv[1]
@@ -56,6 +58,10 @@ for i,cmodel in enumerate(["CRsim","CRflat"]):
             if model in lorimerModels+snrModels: diffTag = model
             templates.append(VirgoContainer(name="Virgo_%s.%s"%(model,label),J=flux,fits=extFits,Xml=modelFile,diffuseTag=diffTag,split=psplit))
 
+if not opts.model is None:
+    templates = [t for t in templates if t.name==opts.model]
+    print 'working on models: {}'.format(templates)
+    
 for t in templates:
     if not t.diffuseTag is None:
         if opts.evars: t.dumpXml()

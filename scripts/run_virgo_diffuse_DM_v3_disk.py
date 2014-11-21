@@ -32,6 +32,10 @@ parser.add_option("--queue",dest='queue', type='str', default = "bullet-xxl",
                  help = "LSF queue")
 parser.add_option("--ignore-logs",dest='ignore_logs', action='store_true', default = False,
                  help = "use this to not change log-dir content (expert option)")
+parser.add_option("--fstate",dest="fstate",default=None,help="if set, specify the final state")
+parser.add_option("--mass",dest="mass",default=None,help="if set, specify the masses")
+parser.add_option("--model",dest="model",default=None,help="instead of running zillion models, choose which one to pick")
+
 (opts, args) = parser.parse_args()
 
 step = sys.argv[1]
@@ -57,6 +61,10 @@ for i,jlabel in enumerate(labels):
             if model in lorimerModels+snrModels: diffTag = model
             templates.append(VirgoContainer(name="Virgo_%s.%s"%(model,label),J=jvals[i],fits=extFits,Xml=modelFile,diffuseTag=diffTag,split=psplit))
 
+if not opts.model is None:
+    templates = [t for t in templates if t.name==opts.model]
+    print 'working on models: {}'.format(templates)
+
 for t in templates:
     if not t.diffuseTag is None:
         if opts.evars: t.dumpXml()
@@ -67,6 +75,8 @@ if opts.split: # test ONLY for split models
     print 'found %i split analyses'%len(templates)
 
 
+    
+
 rdir = "/afs/slac/g/glast/users/zimmer/FermiData/Clusters/Virgo_Diffuse_v3_DD/"
 if not os.path.isdir(rdir): os.system("mkdir -p %s"%rdir)
 rois = VA._setup(templates,rundir=rdir)
@@ -75,10 +85,22 @@ final_states = ['bbar','tautau','ww','mumu','ee']
 jobs = []
 masses = [5,10,20,50,100,200,500,1000.,2000.]
 
+if not opts.fstate is None:
+    if ',' in opts.fstate:
+        final_states = opts.fstate.split(",")
+    else:
+        final_states = [opts.fstate]
+if not opts.mass is None:
+    if ',' in opts.fstate:
+        masses = [float(m) for m in opts.fstate.split(",")]
+    else:
+        masses = [float(opts.mass)]
+
 if opts.debug:
     final_states = ['bbar']
     masses = [20]
     rois = [rois[-1]]
+
 
 do_roi = True
 
