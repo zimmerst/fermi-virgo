@@ -34,7 +34,7 @@ parser.add_option("--ignore-logs",dest='ignore_logs', action='store_true', defau
                  help = "use this to not change log-dir content (expert option)")
 parser.add_option("--fstate",dest="fstate",default=None,help="if set, specify the final state")
 parser.add_option("--mass",dest="mass",default=None,help="if set, specify the masses")
-parser.add_option("--model",dest="model",default=None,help="instead of running zillion models, choose which one to pick")
+parser.add_option("--model",dest="model",default=None,help="instead of running zillion models, choose which one to pick, std is Std_Gal_diffuse")
 
 (opts, args) = parser.parse_args()
 
