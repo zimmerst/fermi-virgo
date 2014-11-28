@@ -20,7 +20,7 @@ if not opts.mass is None:
         masses = [float(m) for m in opts.fstate.split(",")]
     else:
         masses = [float(opts.mass)]
-masses = np.sort(np.array(masses))
+masses = sorted(masses)
 print 'INFO: checking for masses {}'.format(masses)
 ifile = sys.argv[1]
 print 'INFO: processing path %s'%ifile
@@ -31,8 +31,8 @@ for fi in files:
     IS_OK = True
     fo = open(os.path.abspath(fi),'rb')
     d = yaml.load(fo)
-    mkeys = np.sort(np.array(d.keys()))
-    mask = np.where(mkeys!=masses)
-    if np.size(mask):
+    mkeys = sorted(d.keys)
+    not_in_mkeys = [m for m in masses if not m in mkeys]
+    if len(not_in_mkeys):
         IS_OK= False
-        print os.path.basename(fi), mkeys[mask]
+        print os.path.basename(fi), not_in_mkeys
