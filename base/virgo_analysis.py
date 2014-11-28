@@ -457,7 +457,7 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     dout = {}
     if os.path.isfile(yamlfile):
         print '*INFO* results yaml file exists already. Appending results - use force=True to start anew.'
-        if if update_yaml:
+        if update_yaml:
             dout = yaml.load(open(yamlfile,'rb'))
             print '*INFO* found following datapoints in yamlfile: {}'.format(dout.keys())
     dout.update(d)

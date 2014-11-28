@@ -65,7 +65,7 @@ for i,jlabel in enumerate(targets.keys()):
             diffTag = None
             if model in lorimerModels+snrModels: diffTag = model
             templates.append(VirgoContainer(name="Virgo_%s.%s"%(model,label),J=targets[jlabel],fits=extFits,Xml=modelFile,diffuseTag=diffTag,split=psplit))
-
+_templates = templates
 if not opts.model is None:
     opts.model = opts.model.split(",")
     templates = [t for t in templates if t.name in opts.model]
