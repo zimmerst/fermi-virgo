@@ -762,7 +762,7 @@ if __name__ == "__main__":
             process_likelihood(ROI,configuration,float(args[3]),j=float(args[4]),scan=opts.scan,
                                scan_min=opts.scan_min,scan_max=opts.scan_max,scan_npts=opts.scan_npts,
                                force_srcmap=make_srcmap,std_diffuse=opts.diffuse,
-                               yamlfile=opts.yaml_out, update_yam=opts.update_yaml)
+                               yamlfile=opts.yaml_out, update_yaml=opts.update_yaml)
             print '*INFO* done with running, attempting to remove chunk %s'%chunk
             configuration.removeTempDir() # remove the temp dir!
             os.remove(chunk)
