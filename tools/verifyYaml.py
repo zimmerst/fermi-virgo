@@ -31,7 +31,7 @@ for fi in files:
     IS_OK = True
     fo = open(os.path.abspath(fi),'rb')
     d = yaml.load(fo)
-    mkeys = sorted(d.keys)
+    mkeys = sorted(d.keys())
     not_in_mkeys = [m for m in masses if not m in mkeys]
     if len(not_in_mkeys):
         IS_OK= False
