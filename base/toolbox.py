@@ -1,5 +1,5 @@
 from socket import gethostname
-import StringIO, time
+import StringIO, time, yaml
 import numpy as np
 #import os.path
 #from os import system, path, listdir, getenv, environ
@@ -12,6 +12,33 @@ import xml.dom.minidom
 from string import split
 import ROOT as R
 if not sys.flags.interactive: R.gROOT.SetBatch(True)
+
+class cfg(object):
+    def __init__(self,yfile=None,**kwargs):
+        self.yamlfile = yfile
+        self.values = {}
+        if not self.yamlfile is None:
+            self.loadYAML()
+    def toYAML(self,yfile):
+        yaml.dump(self.__dict__,open(yfile,'wb'))
+    def loadYAML(self):
+        if not os.path.isfile(self.yamlfile):
+            raise IOError("yaml file not found")
+        self.values = yaml.load(open(self.yamlfile,'rb'))
+    def get(self,key,callable=str):
+        if not key in self.values:
+            raise KeyError("key %s not present in cfg"%key)
+        return callable(self.values[key])
+    def set(self,key,value):
+        self.values[key]=value
+    def __getitem__(self,key,callable=str):
+        return self.get(key, callable)
+    def __setitem__(self,key,value):
+        self.set(key,value)
+    def show(self):
+        import pprint
+        print('configuration setup')
+        pprint.pprint(self.values)        
 
 class whitness(object):
     # this class can be used to add a logging to work that's been

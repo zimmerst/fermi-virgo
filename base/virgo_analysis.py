@@ -283,7 +283,7 @@ def prepareIC(roi,j,mass,final_state,tmpdir,specDir):
     print '*INF* wrote temporary xml with IC: %s'%ofile
     return ofile
 
-def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,scan=False,scan_min=0,
+def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,scan=False,scan_min=0,update_yaml=False,
                        scan_max=None,scan_npts=20,force_srcmap = True,std_diffuse=True,yamlfile=None,IC=True):
     if roi.__dict__.has_key("egal"):
         os.environ["EGAL"]=roi.egal
@@ -454,7 +454,14 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     # could also try to write yaml
     if yamlfile is None:
         yamlfile = configuration.resultsfile.replace(".pkl",".yaml")
-    yaml.dump(d,open(yamlfile,"wb"))
+    dout = {}
+    if os.path.isfile(yamlfile):
+        print '*INFO* results yaml file exists already. Appending results - use force=True to start anew.'
+        if if update_yaml:
+            dout = yaml.load(open(yamlfile,'rb'))
+            print '*INFO* found following datapoints in yamlfile: {}'.format(dout.keys())
+    dout.update(d)
+    yaml.dump(dout,open(yamlfile,"wb"))
     # now write back
     d_pick = pickle.dumps(d,-1)    
     fo = open(configuration.resultsfile.replace(".pkl",".out"),'w')
@@ -466,7 +473,8 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     del d_pick
     print '*INFO* done at %s'%str(time.ctime())
 
-def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=True,scan=False,scan_min=0,scan_max=None,scan_npts=20,force_srcmap = False,std_diffuse=True,yamlfile=None):
+def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=True,scan=False,scan_min=0,update_yaml=False
+                         scan_max=None,scan_npts=20,force_srcmap = False,std_diffuse=True,yamlfile=None):
     source = "virgo"
     par = "Normalization"
     if model=="powerlaw2":
@@ -585,7 +593,14 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
     time.sleep(sleeptime)    
     if yamlfile is None:
         yamlfile = configuration.resultsfile.replace(".pkl",".yaml")
-    yaml.dump(d,open(yamlfile,"wb"))
+    dout = {}
+    if os.path.isfile(yamlfile):
+        print '*INFO* results yaml file exists already. Appending results - use force=True to start anew.'
+        if update_yaml:
+            dout = yaml.load(open(yamlfile,'rb'))
+            print '*INFO* found following datapoints in yamlfile: {}'.format(dout.keys())
+    dout.update(d)
+    yaml.dump(dout,open(yamlfile,"wb"))
     # now write back
     d_pick = pickle.dumps(d,-1)    
     fo = open(configuration.resultsfile.replace(".pkl",".out"),'w')
@@ -624,7 +639,11 @@ def pack(ROI,configuration,minos_id):
     
 
 
-def likelihood(roi,mass_points,dry=True,ignore_batch=False,final_states=None,j=1.3e18,scan=False,scan_min=None,scan_max=None,scan_npts=20,debug=False,minos_id=19,IC=False,model="PS",sleep='1m',lsf_queue="bullet-xml",force_srcmap=True,std_diffuse=True,CR=False):
+def likelihood(roi,mass_points,dry=True,ignore_batch=False,
+               final_states=None,j=1.3e18,scan=False,scan_min=None,
+               scan_max=None,scan_npts=20,debug=False,minos_id=19,IC=False,
+               model="PS",sleep='1m',lsf_queue="bullet-xml",force_srcmap=True,
+               std_diffuse=True,CR=False,update_yaml=False):
     # scan_max = 200
     # that's the drive routine
     print '*INFO* entering likelihood at %s'%str(time.ctime())
@@ -674,6 +693,7 @@ def likelihood(roi,mass_points,dry=True,ignore_batch=False,final_states=None,j=1
                 if not scan_max is None: cmd+=" --scan_max=%1.4e"%float(scan_max)
                 if not scan_npts is None:cmd+=" --scan_npts=%i"%int(scan_npts)
                 if not std_diffuse: cmd+=" --no-std-diffuse"
+                if update_yaml: cmd+=" --update-yaml"
                 cmds.append(cmd)
             # build the job-array:
             jobname = "Likelihood_%s_%s_%s"%(model,roi.name,roi.configuration.FinalState)
@@ -696,6 +716,8 @@ def likelihood(roi,mass_points,dry=True,ignore_batch=False,final_states=None,j=1
         if not scan_max is None: cmd+=" --scan_max=%1.4e"%float(scan_max)
         if not scan_npts is None:cmd+=" --scan_npts=%i"%int(scan_npts)
         if not std_diffuse: cmd+=" --no-std-diffuse"
+        if update_yaml: cmd+=" --update-yaml"
+
         print '*INFO* cmd to add to array: %s'%cmd
         cmds.append(cmd)
         # build the job-array:
@@ -715,6 +737,8 @@ if __name__ == "__main__":
     #parser.add_option("--minosID",dest='minosID', type=int, default = 19, help="")
     parser.add_option("--scan",dest='scan', action='store_true', default = False,
                       help = "do scan")
+    parser.add_option("--update-yaml",dest='update_yaml', action='store_true', default = False,
+                      help = "update already existing yamls")
     parser.add_option("--no-std-diffuse",dest='diffuse', action='store_false', default = True,
                       help = "use non-std diffuse model, e.g. split models")
     parser.add_option("--IC",dest='ic',action="store_true",default=False,help="enable IC (needs pre-determined masses etc.)")
@@ -735,7 +759,10 @@ if __name__ == "__main__":
             make_srcmap = False
             if opts.ic:
                 make_srcmap = True
-            process_likelihood(ROI,configuration,float(args[3]),j=float(args[4]),scan=opts.scan,scan_min=opts.scan_min,scan_max=opts.scan_max,scan_npts=opts.scan_npts,force_srcmap=make_srcmap,std_diffuse=opts.diffuse,yamlfile=opts.yaml_out)
+            process_likelihood(ROI,configuration,float(args[3]),j=float(args[4]),scan=opts.scan,
+                               scan_min=opts.scan_min,scan_max=opts.scan_max,scan_npts=opts.scan_npts,
+                               force_srcmap=make_srcmap,std_diffuse=opts.diffuse,
+                               yamlfile=opts.yaml_out, update_yam=opts.update_yaml)
             print '*INFO* done with running, attempting to remove chunk %s'%chunk
             configuration.removeTempDir() # remove the temp dir!
             os.remove(chunk)
@@ -754,7 +781,9 @@ if __name__ == "__main__":
             if opts.ic:
                 make_srcmap = True
             print '*Use Std Diffuse: %s*'%opts.diffuse
-            process_likelihoodCR(ROI,configuration,model="file",j=float(args[4]),scan=opts.scan,scan_min=opts.scan_min,scan_max=opts.scan_max,scan_npts=opts.scan_npts,force_srcmap=make_srcmap,std_diffuse=opts.diffuse,yamlfile=opts.yaml_out)
+            process_likelihoodCR(ROI,configuration,model="file",j=float(args[4]),scan=opts.scan,scan_min=opts.scan_min,
+                                 scan_max=opts.scan_max,scan_npts=opts.scan_npts,force_srcmap=make_srcmap,
+                                 std_diffuse=opts.diffuse,yamlfile=opts.yaml_out,update_yaml=opts.update_yaml)
             print '*INFO* done with running, attempting to remove chunk %s'%chunk
             configuration.removeTempDir() # remove the temp dir!
             os.remove(chunk)

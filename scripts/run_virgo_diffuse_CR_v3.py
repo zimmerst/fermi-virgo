@@ -3,7 +3,6 @@ import sys, os, time
 from tempfile import NamedTemporaryFile
 from base.xmltools import expandEnvVarsInXml
 from base.common import *
-
   
 from optparse import OptionParser
 usage = "Usage: %prog  [options] input"

@@ -1,8 +1,8 @@
 import virgo_analysis as VA
-import sys, os
+import sys, os, yaml
 from tempfile import NamedTemporaryFile
 from xmltools import expandEnvVarsInXml
-
+    
 class VirgoContainer(object):
     def __init__(self,**kwargs):
         self.name = None

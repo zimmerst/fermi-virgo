@@ -3,7 +3,6 @@ import sys, os, time
 from tempfile import NamedTemporaryFile
 from base.xmltools import expandEnvVarsInXml
 from base.common import *
-
   
 from optparse import OptionParser
 usage = "Usage: %prog  [options] input"
@@ -35,18 +34,24 @@ parser.add_option("--ignore-logs",dest='ignore_logs', action='store_true', defau
 parser.add_option("--fstate",dest="fstate",default=None,help="if set, specify the final state")
 parser.add_option("--mass",dest="mass",default=None,help="if set, specify the masses")
 parser.add_option("--model",dest="model",default=None,help="instead of running zillion models, choose which one to pick, std is Std_Gal_diffuse")
-
+parser.add_option("--target",dest="target",default=None,help="instead of running over all targets: nfw, gao and miguel")
+parser.add_option("--update-yaml",dest='update_yaml', action='store_true', default = False,help = "update already existing yamls")
 (opts, args) = parser.parse_args()
 
 step = sys.argv[1]
 
 labels = ["nfw","miguel","gao"]
 jvals = [4.41000000e+17,   1.18600000e+19,   4.08100000e+20]
+targets = dict(zip(labels,jvals))
+if not opts.targets is None:
+    opts.targets = opts.targets.split(",")
+    targets = {t for t in targets if t in opts.targets}
+           
 lorimerModels = ["Lorimer_z10_Ts100000","Lorimer_z4_Ts100000","Lorimer_z10_Ts150","Lorimer_z4_Ts150"]
 snrModels = ["SNR_z10_Ts100000","SNR_z4_Ts100000","SNR_z10_Ts150","SNR_z4_Ts150"]
 templates = []
 
-for i,jlabel in enumerate(labels):
+for i,jlabel in enumerate(targets.keys()):
     for j,variant in enumerate(["fixed","split"]):
         psplit = False
         if variant == "split": psplit = True
@@ -59,10 +64,11 @@ for i,jlabel in enumerate(labels):
         for model in models:
             diffTag = None
             if model in lorimerModels+snrModels: diffTag = model
-            templates.append(VirgoContainer(name="Virgo_%s.%s"%(model,label),J=jvals[i],fits=extFits,Xml=modelFile,diffuseTag=diffTag,split=psplit))
+            templates.append(VirgoContainer(name="Virgo_%s.%s"%(model,label),J=targets[jlabel],fits=extFits,Xml=modelFile,diffuseTag=diffTag,split=psplit))
 
 if not opts.model is None:
-    templates = [t for t in templates if t.name==opts.model]
+    opts.model = opts.model.split(",")
+    templates = [t for t in templates if t.name in opts.model]
     print 'working on models: {}'.format(templates)
 
 for t in templates:
@@ -111,7 +117,9 @@ elif step == "LIKELIHOOD":
         if templates[i].split: 
             print '*working on %s'%templates[i].name
             std_diffuse=False
-        VA.likelihood(roi,masses,dry=opts.dry,ignore_batch=True,final_states=final_states,j=templates[i].getJ(),scan=False,scan_npts=15,model="PS",lsf_queue=opts.queue,std_diffuse=std_diffuse)#,debug
+        VA.likelihood(roi,masses,dry=opts.dry,ignore_batch=True,final_states=final_states,j=templates[i].getJ(),
+                      scan=False,scan_npts=15,model="PS",lsf_queue=opts.queue,std_diffuse=std_diffuse,
+                      update_yaml=opts.update_yaml)#,debug
         time.sleep(opts.sleep)
 else:
     raise Exception("Not supported!")
