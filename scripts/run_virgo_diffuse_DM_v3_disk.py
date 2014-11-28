@@ -48,9 +48,9 @@ lorimerModels = ["Lorimer_z10_Ts100000","Lorimer_z4_Ts100000","Lorimer_z10_Ts150
 snrModels = ["SNR_z10_Ts100000","SNR_z4_Ts100000","SNR_z10_Ts150","SNR_z4_Ts150"]
 templates = []
 
-if not opts.targets is None:
-    opts.targets = opts.targets.split(",")
-    targets = {t for t in targets if t in opts.targets}
+if not opts.target is None:
+    opts.target = opts.target.split(",")
+    targets = {t for t in targets if t in opts.target}
 
 for i,jlabel in enumerate(targets.keys()):
     for j,variant in enumerate(["fixed","split"]):
