@@ -473,7 +473,7 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     del d_pick
     print '*INFO* done at %s'%str(time.ctime())
 
-def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=True,scan=False,scan_min=0,update_yaml=False
+def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=True,scan=False,scan_min=0,update_yaml=False,
                          scan_max=None,scan_npts=20,force_srcmap = False,std_diffuse=True,yamlfile=None):
     source = "virgo"
     par = "Normalization"
