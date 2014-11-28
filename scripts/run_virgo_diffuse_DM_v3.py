@@ -96,7 +96,7 @@ if not opts.fstate is None:
         final_states = [opts.fstate]
 if not opts.mass is None:
     if ',' in opts.mass:
-        masses = [float(m) for m in opts.fstate.split(",")]
+        masses = [float(m) for m in opts.mass.split(",")]
     else:
         masses = [float(opts.mass)]
     
