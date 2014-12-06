@@ -36,11 +36,28 @@ def bsub(jobname, command, logfile=None, submit=True, sleep='1m', **kwargs):
             job = command
         else:
             raise Exception("Cannot run job array locally.")
+
     else:
         if isinstance(command,str):
             job = create_job(jobname, command, logfile)
         else:
             job = create_job_array(jobname,command, logfile, sleep)
+        # allow 'time submission' -> handles startup of jobs more easily
+        if 'q' in kwargs:
+            qval = kwargs['q']
+            time_submit = False
+            if ":" in qval:
+                time_submit = True            
+            try:
+                qval = int(kwargs['q'])
+                time_submit = True
+            except ValueError:
+                pass # do nothing
+            # replace -q with -W if time is given! 
+            if time_submit:
+                kwargs['W']=qval
+                kwargs.pop('q') # remove queue
+        # END FIX
         opts = parse_opts(**kwargs)
         job = "bsub "+ opts + job
 
