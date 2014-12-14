@@ -46,7 +46,7 @@ targets = dict(zip(labels,jvals))
 if not opts.target is None:
     targetDictJ = targets
     opts.target = opts.target.split(",")
-    targets = {t:targetDictJ for t in targets if t in opts.target}
+    targets = {t:targetDictJ[t] for t in targets if t in opts.target}
            
 lorimerModels = ["Lorimer_z10_Ts100000","Lorimer_z4_Ts100000","Lorimer_z10_Ts150","Lorimer_z4_Ts150"]
 snrModels = ["SNR_z10_Ts100000","SNR_z4_Ts100000","SNR_z10_Ts150","SNR_z4_Ts150"]
