@@ -1420,7 +1420,7 @@ else:
                         self.list_of_sources.append(thesource)
                         self.sourceNames.append(thesource.name)
 
-        def fitNull(self,export_fit=False):
+        def fitNull(self,export_fit=False,cleanup=True):
             oldModel = self.modelxml
             print '*** DOING NULLFIT ***'
             self.make_nullfit()
@@ -1434,6 +1434,8 @@ else:
             self.modelxml = oldModel
             self._prepare()
             self.configuration.nullhypothesis = "False"
+            if cleanup:
+                self.cleanup()
             if export_fit:
                 return (LLHNull,_dict)
             else:
@@ -1488,7 +1490,8 @@ else:
                     pass
                 mysource.expand(d) # that associates the values from this section with source parameters
                 # done
-
+            return self.likelihood_fcn() 
+        
         def _prepare(self):
             likeObs = BinnedObs(srcMaps=self.files["srcmap"], expCube=self.files["expcube"],
                                 binnedExpMap=self.files["binnedExpMap"], irfs=self.configuration.IRF)
@@ -1544,6 +1547,8 @@ else:
                 print('*INFO* removing temporary xml model %s' % self.modelxml)
                 os.remove(self.modelxml)
                 self.modelxml = self.modelxml_backup
+            del self.likelihood_fcn 
+            del self.minuit_object           
             return
 
 
