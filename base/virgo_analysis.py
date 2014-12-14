@@ -296,6 +296,7 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     llh_scan = None
     par = "sigmav"
     tmpdir = configuration.getTempDir()
+    roi.setTempDir(tmpdir)
     if os.getenv("LSB_JOBID") is None:
         tmpdir = tmpdir.replace("scratch","tmp") # running locally
     if finalstate in ['ee','mumu']:
