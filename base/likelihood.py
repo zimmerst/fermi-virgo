@@ -1421,17 +1421,21 @@ else:
                         self.sourceNames.append(thesource.name)
 
         def fitNull(self,export_fit=False,cleanup=True):
+            bestModel = os.path.join(self.tempdir,"model.xml")
+            nullModel = os.path.join(self.tempdir,"nullModel.xml")
             oldModel = self.modelxml
+            shutil.copy(oldModel,bestModel)
             print '*** DOING NULLFIT ***'
             self.make_nullfit()
+            shutil.copy(self.modelxml,nullModel)
+            self.modelxml = nullModel
             self._prepare()
             self.configuration.nullhypothesis = "True"
             self.fit(None)
             LLHNull = self.likelihood_fcn()
             _dict = self.exportFitResultToDict()
             # got back to best fit setup
-            os.remove(self.modelxml)
-            self.modelxml = oldModel
+            self.modelxml = bestModel
             self._prepare()
             self.configuration.nullhypothesis = "False"
             if cleanup:
@@ -1493,6 +1497,7 @@ else:
             return self.likelihood_fcn() 
         
         def _prepare(self):
+            print '*INFO* source model %s'%self.modelxml
             likeObs = BinnedObs(srcMaps=self.files["srcmap"], expCube=self.files["expcube"],
                                 binnedExpMap=self.files["binnedExpMap"], irfs=self.configuration.IRF)
             self.likelihood_fcn = BinnedAnalysis(likeObs, srcModel=self.modelxml)
