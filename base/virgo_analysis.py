@@ -412,7 +412,7 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     Id = roi.likelihood_fcn.par_index(src.name,par)
     out['sigmav']={'mle':roi.likelihood_fcn[Id].parameter.getValue(),
                    'scale':roi.likelihood_fcn[Id].parameter.getScale(),
-                   'Ts':roi.likelihood_fcn.Ts(src.name,reoptimize=True),
+                   'Ts':TS,
                    'Npred':roi.likelihood_fcn.logLike.NpredValue(src.name)}
 
     if minos:
