@@ -1440,12 +1440,12 @@ else:
             self.fit(None)
             LLHNull = self.likelihood_fcn()
             _dict = self.exportFitResultToDict()
+            if cleanup:
+                self.cleanup()
             # got back to best fit setup
             self.modelxml = bestModel
             self._prepare()
             self.configuration.nullhypothesis = "False"
-            if cleanup:
-                self.cleanup()
             if export_fit:
                 return (LLHNull,_dict)
             else:
@@ -1554,10 +1554,10 @@ else:
             f.close()
 
         def cleanup(self):
-            if self.isnull:
-                print('*INFO* removing temporary xml model %s' % self.modelxml)
-                os.remove(self.modelxml)
-                self.modelxml = self.modelxml_backup
+            #if self.isnull:
+            #    print('*INFO* removing temporary xml model %s' % self.modelxml)
+            #    os.remove(self.modelxml)
+            #    self.modelxml = self.modelxml_backup
             del self.likelihood_fcn 
             del self.minuit_object           
             return
