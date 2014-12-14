@@ -524,6 +524,7 @@ class configuration(object):
         self.env_vars = {}
         self.load_defaults()
         self.chatter = 2
+        self.tempdir = None
         self.set_env(copy.copy(self.env_vars))
         self.makeRandomSeed()
         self.seed = 0
@@ -1267,8 +1268,13 @@ else:
             self.isnull = False
             self.__dict__.update(kwargs)
 
-        
-
+        def setTempDir(self,tempdir):
+            if tempdir is None:
+                raise Exception("must ne not none!")
+            if not os.path.isdir(tempdir):
+                os.system("mkdir -p %s"%tempdir)
+            self.tempdir = tempdir
+            print '*INFO* set temp dir to %s'%tempdir
 
         def getListOfTargets(self,suppressZero=False):
             """
