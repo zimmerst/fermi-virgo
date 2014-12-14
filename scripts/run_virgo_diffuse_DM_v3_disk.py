@@ -51,7 +51,7 @@ templates = []
 if not opts.target is None:
     targetDictJ = targets
     opts.target = opts.target.split(",")
-    targets = {t:targetDictJ for t in targets if t in opts.target}
+    targets = {t:targetDictJ[t] for t in targets if t in opts.target}
 
 
 for i,jlabel in enumerate(targets.keys()):
