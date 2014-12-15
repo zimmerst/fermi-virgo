@@ -224,4 +224,3 @@ if __name__ == "__main__":
         ]
 
     bsub("myArray", commands, logfiles, q='short')
-s
