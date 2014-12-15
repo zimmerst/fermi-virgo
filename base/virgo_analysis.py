@@ -362,14 +362,10 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
             roi.likelihood_fcn[Id].parameter.setBounds(0,1e8) # allow to go big!
             roi.likelihood_fcn[Id].parameter.setValue(float(val[0]))
             roi.likelihood_fcn[Id].parameter.setScale(float("1e%s"%val[-1]))
-    # first do a null-fit
-    NullLLH, NullDict = roi.fitNull(export_fit=True)
     print '*INFO* running with these parameters'
     roi.verifyByEye()
     print '*INFO* entering fit at %s'%str(time.ctime())
     LLH = roi.fit(mysource=src)
-    TS = -2*(LLH-NullLLH)
-    print '*INFO* TS calculated %1.2e'%TS
     minNeg = None
     minPos = None
     llh_scan = None
@@ -391,19 +387,7 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
         except RuntimeError:
             print '*ERROR* could not determine MINOS, but we bravely carry on!'
         src.expand({"minos":(minPos,minNeg),"mass":mass_point})
-#    if scan:
-#        sc_min = scan_min
-#        sc_max = scan_max#
-#
-#        if not minNeg is None:
-#            sc_min = minNeg#
-#
-#        if not minPos is None:
-#            sc_max = minPos
-#        # do the scan
-#        print '*INFO* about to do SCAN'
-#        llh_scan = roi.likelihood_fcn.scan(src.name,par, xmin=sc_min, xmax=sc_max, npts=scan_npts,tol=1e-10, optimizer=configuration.optimizer, optObject=roi.minuit_object)
-
+    # now do a null-fit
     # last not least, need store stuff
     out = {}
     out["fitResultXml"]=roi.exportFitResultToDict() # store stuff as dict instead of xml!
@@ -413,7 +397,6 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     Id = roi.likelihood_fcn.par_index(src.name,par)
     out['sigmav']={'mle':roi.likelihood_fcn[Id].parameter.getValue(),
                    'scale':roi.likelihood_fcn[Id].parameter.getScale(),
-                   'Ts':TS,
                    'Npred':roi.likelihood_fcn.logLike.NpredValue(src.name)}
 
     if minos:
@@ -438,7 +421,8 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     out['CL']=cl
     print '*** calculating current val of LLH ***'
     out['llh']=roi.likelihood_fcn()
-    print '*** done with fits, storing results ***'
+
+
     if not llh_scan is None:
         #if len(llh_scan)==2:
         #    llh_scan[1]*=out['llh']
@@ -446,8 +430,18 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     out['FinalState']=finalstate
     out['ROI']=roi.name
     out['STOOLS']="ST-%s"%os.getenv("INST_DIR").split("/")[-1]
+
+
+    print '*INFO* running nullfit'
+    NullLLH, NullDict = roi.fitNull(export_fit=True)
+    TS = -2*(LLH-NullLLH)
+    out['sigmav']['Ts']=TS
+    print '*INFO* TS calculated %1.2e'%TS
+
     print '*INFO* done with likelihood at %s'%str(time.ctime())
     sleeptime = 15
+    
+    print '*** done with fits, storing results ***'
     print '*INFO* sleeping for %i secs to avoid stressing disk'%sleeptime
     time.sleep(sleeptime)
     f = open(configuration.resultsfile,'rb')
