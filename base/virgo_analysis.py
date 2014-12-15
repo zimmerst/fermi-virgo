@@ -359,7 +359,7 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
             print roi.likelihood_fcn[Id].parameter.getBounds()
 
             roi.likelihood_fcn[Id].parameter.setValue(1.)
-            roi.likelihood_fcn[Id].parameter.setBounds(0,1e8) # allow to go big!
+            roi.likelihood_fcn[Id].parameter.setBounds(0,1e5) # allow to go big!
             roi.likelihood_fcn[Id].parameter.setValue(float(val[0]))
             roi.likelihood_fcn[Id].parameter.setScale(float("1e%s"%val[-1]))
     print '*INFO* running with these parameters'
@@ -391,7 +391,6 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     # last not least, need store stuff
     out = {}
     out["fitResultXml"]=roi.exportFitResultToDict() # store stuff as dict instead of xml!
-    out["nullFitResultXml"]=NullDict # store stuff as dict instead of xml!
     
     out['mass']=mass_point
     Id = roi.likelihood_fcn.par_index(src.name,par)
@@ -436,6 +435,7 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     NullLLH, NullDict = roi.fitNull(export_fit=True)
     TS = -2*(LLH-NullLLH)
     out['sigmav']['Ts']=TS
+    out["nullFitResultXml"]=NullDict # store stuff as dict instead of xml!
     print '*INFO* TS calculated %1.2e'%TS
 
     print '*INFO* done with likelihood at %s'%str(time.ctime())
