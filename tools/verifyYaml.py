@@ -35,4 +35,4 @@ for fi in files:
     not_in_mkeys = [m for m in masses if not m in mkeys]
     if len(not_in_mkeys):
         IS_OK= False
-        print os.path.basename(fi), not_in_mkeys
+        print 'missign keys in %s :'%os.path.basename(fi), not_in_mkeys
