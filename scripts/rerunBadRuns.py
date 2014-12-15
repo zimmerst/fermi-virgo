@@ -3,7 +3,7 @@ Created on Dec 6, 2013
 
 @author: zimmer
 '''
-import base.lsf
+import base.lsf as lsf
 import sys,glob,os
 from time import sleep
 
