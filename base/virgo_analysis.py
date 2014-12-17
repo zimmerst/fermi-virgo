@@ -508,6 +508,7 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
     roi.verifyByEye()
     print '*INFO* entering fit at %s'%str(time.ctime())
     roi.fit(mysource=src)
+    
     minNeg = None
     minPos = None
     llh_scan = None
@@ -549,7 +550,8 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
                    'scale':roi.likelihood_fcn[Id].parameter.getScale(),
                    'Ts':roi.likelihood_fcn.Ts(src.name,reoptimize=True),
                    'Npred':roi.likelihood_fcn.logLike.NpredValue(src.name)}
-
+    out['FitQuality']=roi.get_fitQuality()
+    out['CovarianceMatrix']=roi.getCovarianceMatrix()
     if minos:
         out[par].update({'pos':minPos,'neg':minNeg})
     if scan:
@@ -576,7 +578,7 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
     out['FinalState']=finalstate
     out['ROI']=roi.name
     out['STOOLS']="ST-%s"%os.getenv("INST_DIR").split("/")[-1]
-    out["llh0"]=roi.fitNull()                                               
+    out["llh0"],out["fitResultXml0"]=roi.fitNull(export_fit=True)
     print '*INFO* done with likelihood at %s'%str(time.ctime())
     sleeptime = 15
     print '*INFO* sleeping for %is to avoid stressing disk'%int(sleeptime)
