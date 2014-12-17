@@ -1312,7 +1312,14 @@ else:
 
         def set_fitQuality(self, qual):
             self.fitQuality = qual
-
+        
+        def get_fitQuality(self):
+            if self.fitQualit is None:
+                print("*WARNING* FitQuality is None, return -1")
+                return -1
+            else:
+                return int(self.fitQuality)
+        
         def __getstate__(self):
             # allow pickling                                                                                                       
             d = copy.copy(self.__dict__)
@@ -1336,7 +1343,9 @@ else:
                 c = R.TCanvas("c", "covariance matrix", 400, 400)
                 h2.Draw("colz")
                 c.SaveAs(oplot)
-
+        def getCovarianceMatrix(self,dtype=float):
+            return np.array(self.likelihood_fcn.covariance,dtype=dtype)
+        
         def calculateTSvalue(self, source):
             # for a given source calculate the TSvalue
             LLH = LikelihoodState.LikelihoodState(self.likelihood_fcn)
@@ -1440,6 +1449,8 @@ else:
             self.fit(None)
             LLHNull = self.likelihood_fcn()
             _dict = self.exportFitResultToDict()
+            _dict['fitQuality']=self.get_fitQuality()
+            _dict['CovarianceMatrix']=self.getCovarianceMatrix()
             if cleanup:
                 self.cleanup()
             # got back to best fit setup
@@ -1464,6 +1475,7 @@ else:
             print('** FIT OF ALL SOURCES IN ONE ROUND **')
             self.likelihood_fcn.fit(covar=True, tol=self.eps, optimizer=self.configuration.optimizer,
                                     optObject=self.minuit_object)
+            self.set_fitQuality(self.minuit_object.getQuality())
             if convBool(self.configuration.nullhypothesis):
                 return 0
             else:

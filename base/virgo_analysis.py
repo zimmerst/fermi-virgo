@@ -460,14 +460,14 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     dout.update(d)
     yaml.dump(dout,open(yamlfile,"wb"))
     # now write back
-    d_pick = pickle.dumps(d,-1)    
-    fo = open(configuration.resultsfile.replace(".pkl",".out"),'w')
-    fo.write(str(d))
-    fo.close()
-    f = open(configuration.resultsfile,"wb")
-    f.write(d_pick)
-    f.close()
-    del d_pick
+#     d_pick = pickle.dumps(d,-1)    
+#     fo = open(configuration.resultsfile.replace(".pkl",".out"),'w')
+#     fo.write(str(d))
+#     fo.close()
+#     f = open(configuration.resultsfile,"wb")
+#     f.write(d_pick)
+#     f.close()
+#     del d_pick
     print '*INFO* done at %s'%str(time.ctime())
 
 def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=True,scan=False,scan_min=0,update_yaml=False,
@@ -508,6 +508,7 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
     roi.verifyByEye()
     print '*INFO* entering fit at %s'%str(time.ctime())
     roi.fit(mysource=src)
+    
     minNeg = None
     minPos = None
     llh_scan = None
@@ -549,7 +550,8 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
                    'scale':roi.likelihood_fcn[Id].parameter.getScale(),
                    'Ts':roi.likelihood_fcn.Ts(src.name,reoptimize=True),
                    'Npred':roi.likelihood_fcn.logLike.NpredValue(src.name)}
-
+    out['FitQuality']=roi.get_fitQuality()
+    out['CovarianceMatrix']=roi.getCovarianceMatrix()
     if minos:
         out[par].update({'pos':minPos,'neg':minNeg})
     if scan:
@@ -576,7 +578,7 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
     out['FinalState']=finalstate
     out['ROI']=roi.name
     out['STOOLS']="ST-%s"%os.getenv("INST_DIR").split("/")[-1]
-    out["llh0"]=roi.fitNull()                                               
+    out["llh0"],out["fitResultXml0"]=roi.fitNull(export_fit=True)
     print '*INFO* done with likelihood at %s'%str(time.ctime())
     sleeptime = 15
     print '*INFO* sleeping for %is to avoid stressing disk'%int(sleeptime)
@@ -599,14 +601,14 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
     dout.update(d)
     yaml.dump(dout,open(yamlfile,"wb"))
     # now write back
-    d_pick = pickle.dumps(d,-1)    
-    fo = open(configuration.resultsfile.replace(".pkl",".out"),'w')
-    fo.write(str(d))
-    fo.close()
-    f = open(configuration.resultsfile,"wb")
-    f.write(d_pick)
-    f.close()
-    del d_pick
+#     d_pick = pickle.dumps(d,-1)    
+#     fo = open(configuration.resultsfile.replace(".pkl",".out"),'w')
+#     fo.write(str(d))
+#     fo.close()
+#     f = open(configuration.resultsfile,"wb")
+#     f.write(d_pick)
+#     f.close()
+#     del d_pick
     print '*INFO* done at %s'%str(time.ctime())
 
 def load(chunk):
@@ -672,12 +674,12 @@ def likelihood(roi,mass_points,dry=True,ignore_batch=False,
             print '*INFO*: mass points for %s %s'%(f,str(masses))
             roi.configuration.FinalState=f
             roi.configuration.resultsfile = os.path.join(roi.configuration.my_run_dir,"outputLLH_%s_%s.pkl"%(roi.name,f))
-            d = {}
-            d_pick = pickle.dumps(d,-1)    
-            f = open(roi.configuration.resultsfile,"wb")
-            f.write(d_pick)
-            f.close()
-            del d_pick
+#             d = {}
+#             d_pick = pickle.dumps(d,-1)    
+#             f = open(roi.configuration.resultsfile,"wb")
+#             f.write(d_pick)
+#             f.close()
+#             del d_pick
             if not IC: chunk = pack(roi,roi.configuration,minos_id)
             #print '*INFO* packing chunk %s'%chunk
             cmds = []
@@ -699,12 +701,12 @@ def likelihood(roi,mass_points,dry=True,ignore_batch=False,
         cmds = []
         roi.configuration.FinalState= "CR"
         roi.configuration.resultsfile = os.path.join(roi.configuration.my_run_dir,"outputLLH_%s_%s.pkl"%(roi.name,"CR"))
-        d = {}
-        d_pick = pickle.dumps(d,-1)    
-        f = open(roi.configuration.resultsfile,"wb")
-        f.write(d_pick)
-        f.close()
-        del d_pick
+#         d = {}
+#         d_pick = pickle.dumps(d,-1)    
+#         f = open(roi.configuration.resultsfile,"wb")
+#         f.write(d_pick)
+#         f.close()
+#         del d_pick
         chunk = pack(roi,roi.configuration,minos_id)
         print '*INFO* packing chunk %s'%chunk
         cmd = 'python fermi-virgo/base/virgo_analysis.py "runLikelihoodCR" %s %1.8f %1.8e'%(chunk,100.,j)
