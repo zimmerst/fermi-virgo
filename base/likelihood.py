@@ -1314,7 +1314,7 @@ else:
             self.fitQuality = qual
         
         def get_fitQuality(self):
-            if self.fitQualit is None:
+            if self.fitQuality is None:
                 print("*WARNING* FitQuality is None, return -1")
                 return -1
             else:
