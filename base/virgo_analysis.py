@@ -444,11 +444,8 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     print '*** done with fits, storing results ***'
     print '*INFO* sleeping for %i secs to avoid stressing disk'%sleeptime
     time.sleep(sleeptime)
-    f = open(configuration.resultsfile,'rb')
-    dumpstring = f.read()
-    d = pickle.loads(dumpstring)
-    d.update({mass_point:out}) # update old dict
     # could also try to write yaml
+    d={mass_point:out}
     if yamlfile is None:
         yamlfile = configuration.resultsfile.replace(".pkl",".yaml")
     dout = {}
@@ -583,10 +580,7 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
     sleeptime = 15
     print '*INFO* sleeping for %is to avoid stressing disk'%int(sleeptime)
     time.sleep(sleeptime)    
-    f = open(configuration.resultsfile,'rb')
-    dumpstring = f.read()
-    d = pickle.loads(dumpstring)
-    d.update({"CR":out}) # update old dict
+    d = {"CR":out}
     # could also try to write yaml
     print '*INFO* sleeping for %is to avoid stressing disk'%int(sleeptime)
     time.sleep(sleeptime)    
