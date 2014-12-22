@@ -391,13 +391,13 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     # last not least, need store stuff
     out = {}
     out["fitResultXml"]=roi.exportFitResultToDict() # store stuff as dict instead of xml!
-    
+    out["fitResultXml"].update({'FitQuality':roi.get_fitQuality(), 'CovarianceMatrix':roi.getCovarianceMatrix()})
     out['mass']=mass_point
     Id = roi.likelihood_fcn.par_index(src.name,par)
     out['sigmav']={'mle':roi.likelihood_fcn[Id].parameter.getValue(),
                    'scale':roi.likelihood_fcn[Id].parameter.getScale(),
                    'Npred':roi.likelihood_fcn.logLike.NpredValue(src.name)}
-
+    
     if minos:
         out['sigmav'].update({'pos':minPos,'neg':minNeg})
     if scan:
@@ -430,12 +430,13 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     out['ROI']=roi.name
     out['STOOLS']="ST-%s"%os.getenv("INST_DIR").split("/")[-1]
 
-
     print '*INFO* running nullfit'
     NullLLH, NullDict = roi.fitNull(export_fit=True)
     TS = -2*(LLH-NullLLH)
     out['sigmav']['Ts']=TS
-    out["nullFitResultXml"]=NullDict # store stuff as dict instead of xml!
+    out["llh0"] = NullLLH
+    out["fitResultXml0"]=NullDict
+
     print '*INFO* TS calculated %1.2e'%TS
 
     print '*INFO* done with likelihood at %s'%str(time.ctime())
@@ -547,8 +548,7 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
                    'scale':roi.likelihood_fcn[Id].parameter.getScale(),
                    'Ts':roi.likelihood_fcn.Ts(src.name,reoptimize=True),
                    'Npred':roi.likelihood_fcn.logLike.NpredValue(src.name)}
-    out['FitQuality']=roi.get_fitQuality()
-    out['CovarianceMatrix']=roi.getCovarianceMatrix()
+    out["fitResultXml"].update({'FitQuality':roi.get_fitQuality(), 'CovarianceMatrix':roi.getCovarianceMatrix()})
     if minos:
         out[par].update({'pos':minPos,'neg':minNeg})
     if scan:
