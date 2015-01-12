@@ -1248,6 +1248,7 @@ else:
             self.modelxml = None
             self.modelxml_backup = None
             self.list_of_sources = []
+            self.freeSources = None
             self.files = {}
             self.extended = False
             self.likelihood_fcn = None
@@ -1461,7 +1462,7 @@ else:
                 return (LLHNull,_dict)
             else:
                 return LLHNull,None
-
+ 
         def fit(self, mysource):
             print('*INFO* now entering FIT ')
             #print self.minuit_object
@@ -1513,12 +1514,24 @@ else:
                 mysource.expand(d) # that associates the values from this section with source parameters
                 # done
             return self.likelihood_fcn() 
-        
+        def getFreeSources(self,model):
+            def checkSource(xnode):
+                isFree = False
+                for p in xnode.getElementsByTagName("parameter"):
+                    if p.getAttribute("free")=="1":
+                        isFree = True
+                return isFree
+            xm = xdom.parse(self.modelxml)
+            xsources = xm.getElementsByTagName("source")
+            free_sources = [src.getAttribute("name") for src in xsources if checkSource(src)]
+            return free_sources
+            
         def _prepare(self):
             print '*INFO* source model %s'%self.modelxml
             likeObs = BinnedObs(srcMaps=self.files["srcmap"], expCube=self.files["expcube"],
                                 binnedExpMap=self.files["binnedExpMap"], irfs=self.configuration.IRF)
             self.likelihood_fcn = BinnedAnalysis(likeObs, srcModel=self.modelxml)
+            self.freeSources = self.getFreeSources(self.modelxml)
             old_verbosity = self.likelihood_fcn.verbosity
             self.likelihood_fcn.verbosity = 3
             print ('*INFO* Energy Range for Analysis %1.1f -- %1.1f MeV'%(float(self.configuration.EMin), float(self.configuration.EMax)))
