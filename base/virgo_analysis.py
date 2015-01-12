@@ -7,6 +7,7 @@ from skymaps import SkyDir
 import numpy as np
 import copy, sys, os, pickle, time, yaml
 import lsf
+from __builtin__ import False, True
 
 def effectiveJ(mass,finalState="ee"):
     ratio_ee = {80.0: 6870.8334694828354, 100.0: 7857.3235653271013, 5.0: 1.0, 1000.0: 8796.6830234728004, 
@@ -285,6 +286,7 @@ def prepareIC(roi,j,mass,final_state,tmpdir,specDir):
 
 def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,scan=False,scan_min=0,update_yaml=False,
                        scan_max=None,scan_npts=20,force_srcmap = True,std_diffuse=True,yamlfile=None,IC=True):
+    DoCalculateTS = True
     if roi.__dict__.has_key("egal"):
         os.environ["EGAL"]=roi.egal
     if roi.__dict__.has_key("gal"):
@@ -397,7 +399,12 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     out['sigmav']={'mle':roi.likelihood_fcn[Id].parameter.getValue(),
                    'scale':roi.likelihood_fcn[Id].parameter.getScale(),
                    'Npred':roi.likelihood_fcn.logLike.NpredValue(src.name)}
-    
+    if DoCalculateTS:
+        if roi.freeSources is None:
+            raise Exception("list of free sources not properly loaded")
+        tsList = {src:roi.likelihood_fcn.Ts(s,reoptimize=True) for s in roi.freeSources if not s==src.name} # ignore actual target
+        out['TsSources']=tsList
+
     if minos:
         out['sigmav'].update({'pos':minPos,'neg':minNeg})
     if scan:
@@ -431,12 +438,11 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     out['STOOLS']="ST-%s"%os.getenv("INST_DIR").split("/")[-1]
 
     print '*INFO* running nullfit'
-    NullLLH, NullDict = roi.fitNull(export_fit=True)
+    NullLLH, NullDict = roi.fitNull(export_fit=True,cleanup=False) # roi still refers to null fit!
     TS = -2*(LLH-NullLLH)
     out['sigmav']['Ts']=TS
     out["llh0"] = NullLLH
     out["fitResultXml0"]=NullDict
-
     print '*INFO* TS calculated %1.2e'%TS
 
     print '*INFO* done with likelihood at %s'%str(time.ctime())
@@ -456,6 +462,15 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
             dout = yaml.load(open(yamlfile,'rb'))
             print '*INFO* found following datapoints in yamlfile: {}'.format(dout.keys())
     dout.update(d)
+    ### storing the nullfit as fits file ###
+    store_nullfit=True
+    for key in dout:
+        if dout[key]['store_nullfit']:
+            store_nullfit=False
+    if store_nullfit:
+        ofile = yamlfile.replace(".yaml",".nullfit.fits")
+        roi.safeWriteCountsSpectra(ofile)
+        dout[mass_point]['store_nullfit']=True
     yaml.dump(dout,open(yamlfile,"wb"))
     # now write back
 #     d_pick = pickle.dumps(d,-1)    
@@ -575,7 +590,7 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
     out['FinalState']=finalstate
     out['ROI']=roi.name
     out['STOOLS']="ST-%s"%os.getenv("INST_DIR").split("/")[-1]
-    out["llh0"],out["fitResultXml0"]=roi.fitNull(export_fit=True)
+    out["llh0"],out["fitResultXml0"]=roi.fitNull(export_fit=True,cleanup=False) # roi will still contain the null fit!
     print '*INFO* done with likelihood at %s'%str(time.ctime())
     sleeptime = 15
     print '*INFO* sleeping for %is to avoid stressing disk'%int(sleeptime)
@@ -593,6 +608,16 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
             dout = yaml.load(open(yamlfile,'rb'))
             print '*INFO* found following datapoints in yamlfile: {}'.format(dout.keys())
     dout.update(d)
+
+    store_nullfit=True
+    for key in dout:
+        if dout[key]['store_nullfit']:
+            store_nullfit=False
+    if store_nullfit:
+        ofile = yamlfile.replace(".yaml",".nullfit.fits")
+        roi.safeWriteCountsSpectra(ofile)
+        dout["CR"]['store_nullfit']=True
+
     yaml.dump(dout,open(yamlfile,"wb"))
     # now write back
 #     d_pick = pickle.dumps(d,-1)    

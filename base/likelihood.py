@@ -1248,6 +1248,7 @@ else:
             self.modelxml = None
             self.modelxml_backup = None
             self.list_of_sources = []
+            self.freeSources = None
             self.files = {}
             self.extended = False
             self.likelihood_fcn = None
@@ -1453,15 +1454,15 @@ else:
             _dict['CovarianceMatrix']=self.getCovarianceMatrix()
             if cleanup:
                 self.cleanup()
-            # got back to best fit setup
-            self.modelxml = bestModel
-            self._prepare()
-            self.configuration.nullhypothesis = "False"
+                # got back to best fit setup
+                self.modelxml = bestModel
+                self._prepare()
+                self.configuration.nullhypothesis = "False"
             if export_fit:
                 return (LLHNull,_dict)
             else:
                 return LLHNull,None
-
+ 
         def fit(self, mysource):
             print('*INFO* now entering FIT ')
             #print self.minuit_object
@@ -1513,12 +1514,39 @@ else:
                 mysource.expand(d) # that associates the values from this section with source parameters
                 # done
             return self.likelihood_fcn() 
-        
+        def getFreeSources(self,model):
+            def checkSource(xnode):
+                isFree = False
+                for p in xnode.getElementsByTagName("parameter"):
+                    if p.getAttribute("free")=="1":
+                        isFree = True
+                return isFree
+            xm = xdom.parse(self.modelxml)
+            xsources = xm.getElementsByTagName("source")
+            free_sources = [src.getAttribute("name") for src in xsources if checkSource(src)]
+            return free_sources
+        def safeWriteCountsSpectra(self,ofile,sleeptime=10,ntries=3,overwrite=False):
+            """ use this proxy method to avoid trashing the disk """
+            if not overwrite:
+                if os.path.isfile(ofile):
+                    print "*INFO* file %s exists already, skipping"%ofile
+                    return
+            for i in range(ntries):
+                try:
+                    self.likelihood_fcn.writeCountsSpectra(ofile)
+                except IOError, io:
+                    print '*WARNING* try %i/%i caught IO Error trying again after sleep %s'%((i+1),ntries,str(io))
+                time.sleep(sleeptime)
+            if not os.path.isfile(ofile):
+                raise Exception("*FATAL* could not store %s after %i tries. Giving up!"%(ofile,ntries))
+            return
+
         def _prepare(self):
             print '*INFO* source model %s'%self.modelxml
             likeObs = BinnedObs(srcMaps=self.files["srcmap"], expCube=self.files["expcube"],
                                 binnedExpMap=self.files["binnedExpMap"], irfs=self.configuration.IRF)
             self.likelihood_fcn = BinnedAnalysis(likeObs, srcModel=self.modelxml)
+            self.freeSources = self.getFreeSources(self.modelxml)
             old_verbosity = self.likelihood_fcn.verbosity
             self.likelihood_fcn.verbosity = 3
             print ('*INFO* Energy Range for Analysis %1.1f -- %1.1f MeV'%(float(self.configuration.EMin), float(self.configuration.EMax)))
@@ -1849,7 +1877,22 @@ else:
                     sleeptime = random.randrange(60, 300) # sleep between 15 and 120 seconds
                 time.sleep(sleeptime)
             toolbox.runExec(command_line)
-
+        def makeModelCube(self,ofile,**kwargs):
+            raise NotImplementedError("method not yet functional, placeholder")
+            gc.enable()
+            toolbox.setPF()
+            app = GtApp('gtmodel')
+            app.run(srcmaps=self.files['srcmap'],
+                    srcmdl=self.modelxml,
+                    outfile=ofile,
+                    irfs=self.configuration.IRF,
+                    expcube=self.files['expcube'],
+                    bexpmap=self.files['binnedExpMap'],
+                    chatter=4,
+                    **kwargs)
+            toolbox.cleanPF()
+            gc.collect()
+            
         def CALL_MakeSpatialResidualPlot(self, run=True, **kwargs):
             #print "****D E B U G ****"
             #print self.__dict__
