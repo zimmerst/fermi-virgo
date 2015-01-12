@@ -402,8 +402,11 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     if DoCalculateTS:
         if roi.freeSources is None:
             raise Exception("list of free sources not properly loaded")
-        tsList = {src:roi.likelihood_fcn.Ts(s,reoptimize=True) for s in roi.freeSources if not s==src.name} # ignore actual target
+        srclist = [str(s) for s in roi.freeSources]
+        print '*INFO* free sources ()'.format(srclist)
+        tsList = {s:roi.likelihood_fcn.Ts(s,reoptimize=True) for s in srclist if not s == src.name} # ignore actual target
         out['TsSources']=tsList
+        print '*INFO* TS list {}'.format(tsList)
 
     if minos:
         out['sigmav'].update({'pos':minPos,'neg':minNeg})
@@ -561,7 +564,6 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
     Id = roi.likelihood_fcn.par_index(src.name,par)
     out[par]={'mle':roi.likelihood_fcn[Id].parameter.getValue(),
                    'scale':roi.likelihood_fcn[Id].parameter.getScale(),
-                   'Ts':roi.likelihood_fcn.Ts(src.name,reoptimize=True),
                    'Npred':roi.likelihood_fcn.logLike.NpredValue(src.name)}
     out["fitResultXml"].update({'FitQuality':roi.get_fitQuality(), 'CovarianceMatrix':roi.getCovarianceMatrix()})
     if minos:
@@ -572,14 +574,12 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
         print '*running with Standard Diffuse model*'
         Id = roi.likelihood_fcn.par_index("GAL","Prefactor")
         out['GAL']={'Prefactor':roi.likelihood_fcn[Id].parameter.getValue()*roi.likelihood_fcn[Id].parameter.getScale(),
-                    'Ts':roi.likelihood_fcn.Ts("GAL",reoptimize=True),
                     'Npred':roi.likelihood_fcn.logLike.NpredValue("GAL")}
         Id = roi.likelihood_fcn.par_index("GAL","Index")
         out['GAL']["Index"]=roi.likelihood_fcn[Id].parameter.getValue()*roi.likelihood_fcn[Id].parameter.getScale()
     
     Id = roi.likelihood_fcn.par_index("EGAL","Normalization")
     out['EGAL']={'Normalization':roi.likelihood_fcn[Id].parameter.getValue()*roi.likelihood_fcn[Id].parameter.getScale(),
-                'Ts':roi.likelihood_fcn.Ts("EGAL",reoptimize=True),
                 'Npred':roi.likelihood_fcn.logLike.NpredValue("EGAL")}
     out['CL']=cl
     out['llh']=roi.likelihood_fcn()
