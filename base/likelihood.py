@@ -1877,7 +1877,22 @@ else:
                     sleeptime = random.randrange(60, 300) # sleep between 15 and 120 seconds
                 time.sleep(sleeptime)
             toolbox.runExec(command_line)
-
+        def makeModelCube(self,ofile,**kwargs):
+            raise NotImplementedError("method not yet functional, placeholder")
+            gc.enable()
+            toolbox.setPF()
+            app = GtApp('gtmodel')
+            app.run(srcmaps=self.files['srcmap'],
+                    srcmdl=self.modelxml,
+                    outfile=ofile,
+                    irfs=self.configuration.IRF,
+                    expcube=self.files['expcube'],
+                    bexpmap=self.files['binnedExpMap'],
+                    chatter=4,
+                    **kwargs)
+            toolbox.cleanPF()
+            gc.collect()
+            
         def CALL_MakeSpatialResidualPlot(self, run=True, **kwargs):
             #print "****D E B U G ****"
             #print self.__dict__
