@@ -1454,10 +1454,10 @@ else:
             _dict['CovarianceMatrix']=self.getCovarianceMatrix()
             if cleanup:
                 self.cleanup()
-            # got back to best fit setup
-            self.modelxml = bestModel
-            self._prepare()
-            self.configuration.nullhypothesis = "False"
+                # got back to best fit setup
+                self.modelxml = bestModel
+                self._prepare()
+                self.configuration.nullhypothesis = "False"
             if export_fit:
                 return (LLHNull,_dict)
             else:
@@ -1525,7 +1525,22 @@ else:
             xsources = xm.getElementsByTagName("source")
             free_sources = [src.getAttribute("name") for src in xsources if checkSource(src)]
             return free_sources
-            
+        def safeWriteCountsSpectra(self,ofile,sleeptime=10,ntries=3,overwrite=False):
+            """ use this proxy method to avoid trashing the disk """
+            if not overwrite:
+                if os.path.isfile(ofile):
+                    print "*INFO* file %s exists already, skipping"%ofile
+                    return
+            for i in range(ntries):
+                try:
+                    self.likelihood_fcn.writeCountsSpectra(ofile)
+                except IOError, io:
+                    print '*WARNING* try %i/%i caught IO Error trying again after sleep %s'%((i+1),ntries,str(io))
+                time.sleep(sleeptime)
+            if not os.path.isfile(ofile):
+                raise Exception("*FATAL* could not store %s after %i tries. Giving up!"%(ofile,ntries))
+            return
+
         def _prepare(self):
             print '*INFO* source model %s'%self.modelxml
             likeObs = BinnedObs(srcMaps=self.files["srcmap"], expCube=self.files["expcube"],

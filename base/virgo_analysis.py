@@ -438,7 +438,7 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     out['STOOLS']="ST-%s"%os.getenv("INST_DIR").split("/")[-1]
 
     print '*INFO* running nullfit'
-    NullLLH, NullDict = roi.fitNull(export_fit=True)
+    NullLLH, NullDict = roi.fitNull(export_fit=True,cleanup=False) # roi still refers to null fit!
     TS = -2*(LLH-NullLLH)
     out['sigmav']['Ts']=TS
     out["llh0"] = NullLLH
@@ -468,10 +468,9 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
         if dout[key]['store_nullfit']:
             store_nullfit=False
     if store_nullfit:
-        ofile = os.path.join(os.path.basename(yamlfile),'nullFit.fits')
-        roi.likelihood_fcn.writeCountsSpectra(ofile)
+        ofile = yamlfile.replace(".yaml",".nullfit.fits")
+        roi.safeWriteCountsSpectra(ofile)
         dout[mass_point]['store_nullfit']=True
-        
     yaml.dump(dout,open(yamlfile,"wb"))
     # now write back
 #     d_pick = pickle.dumps(d,-1)    
@@ -591,7 +590,7 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
     out['FinalState']=finalstate
     out['ROI']=roi.name
     out['STOOLS']="ST-%s"%os.getenv("INST_DIR").split("/")[-1]
-    out["llh0"],out["fitResultXml0"]=roi.fitNull(export_fit=True)
+    out["llh0"],out["fitResultXml0"]=roi.fitNull(export_fit=True,cleanup=False) # roi will still contain the null fit!
     print '*INFO* done with likelihood at %s'%str(time.ctime())
     sleeptime = 15
     print '*INFO* sleeping for %is to avoid stressing disk'%int(sleeptime)
@@ -609,6 +608,16 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
             dout = yaml.load(open(yamlfile,'rb'))
             print '*INFO* found following datapoints in yamlfile: {}'.format(dout.keys())
     dout.update(d)
+
+    store_nullfit=True
+    for key in dout:
+        if dout[key]['store_nullfit']:
+            store_nullfit=False
+    if store_nullfit:
+        ofile = yamlfile.replace(".yaml",".nullfit.fits")
+        roi.safeWriteCountsSpectra(ofile)
+        dout["CR"]['store_nullfit']=True
+
     yaml.dump(dout,open(yamlfile,"wb"))
     # now write back
 #     d_pick = pickle.dumps(d,-1)    
