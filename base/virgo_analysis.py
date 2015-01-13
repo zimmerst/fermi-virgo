@@ -468,8 +468,9 @@ def process_likelihood(roi,configuration,mass_point,j=1.3e18,cl=2.71,minos=True,
     ### storing the nullfit as fits file ###
     store_nullfit=True
     for key in dout:
-        if dout[key]['store_nullfit']:
-            store_nullfit=False
+        if 'store_nullfit' in dout[key]:
+            if dout[key]['store_nullfit']:
+                store_nullfit=False
     if store_nullfit:
         ofile = yamlfile.replace(".yaml",".nullfit.fits")
         roi.safeWriteCountsSpectra(ofile)
@@ -611,8 +612,9 @@ def process_likelihoodCR(roi,configuration,model="file",j=1.3e18,cl=2.71,minos=T
 
     store_nullfit=True
     for key in dout:
-        if dout[key]['store_nullfit']:
-            store_nullfit=False
+        if 'store_nullfit' in dout[key]:
+            if dout[key]['store_nullfit']:
+                store_nullfit=False
     if store_nullfit:
         ofile = yamlfile.replace(".yaml",".nullfit.fits")
         roi.safeWriteCountsSpectra(ofile)
